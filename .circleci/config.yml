@@ -41,7 +41,7 @@ jobs:
     steps:
       - deploy: 
           name: digital-ocean 
-          command: ssh -o "StrictHostKeyChecking no" root@68.183.161.83 "cd ~/influx-express; git checkout master; git pull; npm install; pm2 restart index.js"
+          command: ssh -o "StrictHostKeyChecking no" root@68.183.161.83 "cd ~/influx-express; git checkout master; git pull; npm install; pm2 restart app.js"
 
 workflows:
   version: 2
