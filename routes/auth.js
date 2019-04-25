@@ -2,8 +2,7 @@ var express = require('express');
 var router = express.Router();
 var db = require('../config/database').db;
 var firebase = require('../config/database').firebase;
-var admin = require("firebase-admin");
-var serviceAccount = require("./admin.json");
+var admin = require("../config/database").admin;
 
 if(!admin.apps.length){
 admin.initializeApp({
@@ -17,10 +16,18 @@ router.post('/', function (req, res, next) {
     if (!req.body.password) return res.status(400).json({ error: 'missing password' });
 
     firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password).then(async(resfb) => {
-        let uid = await resfb.user.getIdToken();
-        console.log(resfb.user);
-        console.log(req.headers);
-        res.send({ message: 'Logged in!', idToken: uid });
+        let idtoken = await resfb.user.getIdToken();
+        var adminstatus;
+        admin.auth().getUser(resfb.user.uid).then((record) => {
+            if (!record.customClaims) {
+                adminstatus = false;
+            } else {
+                adminstatus = record.customClaims.admin;
+            }
+        }).then(function () {
+            console.log(adminstatus);
+            res.send({ message: 'Logged in!', idToken: idtoken, admin: adminstatus }); 
+        });
     })
     
 });
