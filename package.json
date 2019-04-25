@@ -11,6 +11,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "firebase": "^5.10.0",
+    "firebase-admin": "^7.3.0",
     "morgan": "~1.9.0"
   },
   "main": "app.js",
