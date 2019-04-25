@@ -1,7 +1,7 @@
 var firebase = require('firebase');
 
 var config = {
-    apiKey: "fillertest",
+    apiKey: "fillertests",
     authDomain: "influx-trace.firebaseapp.com",
     databaseURL: "https://influx-trace.firebaseio.com",
     projectId: "influx-trace",
