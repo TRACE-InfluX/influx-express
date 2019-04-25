@@ -28,7 +28,7 @@ router.get('/', function (req, res, next) {
     //checks to see if the authorization header is there
     if (!req.headers.authorization) {
         console.log(req.headers);
-        res.send({ status: 401, message: "No idtoken provided" });
+        res.status(401).send({message: "No idtoken provided" });
     } else {
         var authorizationpayload = req.headers.authorization.split(' ');
         //checks to see if it is bearer token somewhere
