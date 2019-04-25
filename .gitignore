@@ -62,5 +62,5 @@ typings/
 
 # some IDE stuff goes here
 .vs/
-*.json
+config/*.json
 config/database.js

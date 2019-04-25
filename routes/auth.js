@@ -8,8 +8,9 @@ router.post('/', function (req, res, next) {
 
     firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password).then(async(resfb) => {
         let uid = await resfb.user.getIdToken();
-        console.log(resfb.user)
-        res.send({ message: 'Logged in!', uid: uid });
+        console.log(resfb.user);
+        console.log(req.headers);
+        res.send({ message: 'Logged in!', idToken: uid });
     })
     
 });
