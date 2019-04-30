@@ -27,7 +27,9 @@ router.post('/', function (req, res, next) {
         }).then(function () {
             console.log(adminstatus);
             res.send({ message: 'Logged in!', idToken: idtoken, admin: adminstatus }); 
-        });
+        })
+    }).catch(err => {
+      return res.status(401).json({error: err})
     })
     
 });
