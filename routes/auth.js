@@ -25,11 +25,11 @@ router.post('/', async (req, res, next) => {
       let resfb   = await firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
       let idToken = await resfb.user.getIdToken();
       let record  = await admin.auth().getUser(resfb.user.uid)
-      let admin   = false;
+      let adminStatus   = false;
       if (record.customClaims) {
-          admin = record.customClaims.admin;
+          adminStatus = record.customClaims.admin;
       }
-      res.send({ message: 'Logged in!', idToken, admin }); 
+      res.send({ message: 'Logged in!', idToken, admin: adminStatus }); 
     }
     catch (error) {
       res.status(401).json({error})
