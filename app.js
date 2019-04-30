@@ -9,7 +9,8 @@ var usersRouter = require('./routes/users');
 var accountsRouter = require('./routes/accounts');
 var auth = require('./routes/auth');
 var app = express();
-
+var passport = require('passport');
+app.use(passport.initialize());
 app.use(cors());
 app.options("*", cors());
 app.use(logger('dev'));
