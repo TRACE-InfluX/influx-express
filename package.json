@@ -12,7 +12,9 @@
     "express": "~4.16.0",
     "firebase": "^5.10.0",
     "firebase-admin": "^7.3.0",
-    "morgan": "~1.9.0"
+    "morgan": "~1.9.0",
+    "passport": "^0.4.0",
+    "passport-http-bearer": "^1.0.1"
   },
   "main": "app.js",
   "repository": "git@github.com:TRACE-InfluX/influx-express.git",

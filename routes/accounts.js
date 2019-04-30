@@ -3,7 +3,7 @@ var router = express.Router();
 var db = require('../config/database').db;
 var firebase = require('../config/database').firebase;
 var admin = require('../config/database').admin;
-
+var passport = require('../config/passport');
 router.post('/', function (req, res, next) {
     if (!req.body.email) return res.status(400).json({ error: 'missing email' });
     if (!req.body.password) return res.status(400).json({ error: 'missing password' });
@@ -24,11 +24,9 @@ router.post('/', function (req, res, next) {
 });
 
 
-router.get('/', function (req, res, next) {
+router.get('/', passport.authenticate('bearer', { session: false }), function (req, res, next) {
     //checks to see if the authorization header is there
     if (!req.headers.authorization) {
-        console.log(req.headers);
-        res.status(401).send({message: "No idtoken provided" });
     } else {
         var authorizationpayload = req.headers.authorization.split(' ');
         //checks to see if it is bearer token somewhere
