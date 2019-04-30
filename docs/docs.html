@@ -1,0 +1,170 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Documentation</title>
+  <meta name="description" content="The HTML5 Herald">
+
+  <style>
+       table, th, td{
+           color:#575757;
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align:left;
+            font-family:arial;
+        }
+</style>
+
+</head>
+
+<body>
+    <H1>Influx Documentation</H1>
+    <H2>Influencers</H2>
+<table>
+    <tr>
+        <th><h3>Field</h3></th>
+        <th><h3>Type</h3></th>
+        <th><h3>Description</h3></th>
+    </tr>
+    <tr>
+        <th>influencerID</th>
+        <th>int</th>
+        <th>Uniqie ID for influencer</th>
+    </tr>
+    <tr>
+        <th>influencerName</th>
+        <th>string</th>
+        <th>Name of instagram account</th>
+    </tr>
+    <tr>
+        <th>influencerURL</th>
+        <th>string</th>
+        <th>URL of influencer's instagram account</th>
+    </tr>
+    <tr>
+        <th>Followers</th>
+        <th>int</th>
+        <th>Number of followers</th>
+    </tr>
+    <tr>
+        <th>Following</th>
+        <th>int</th>
+        <th>Number that they follow</th>
+    </tr>
+    <tr>
+        <th>Posts</th>
+        <th>int</th>
+        <th>Number of posts the user has made</th>
+    </tr>
+    <tr>
+        <th>Activity</th>
+        <th>int</th>
+        <th>Activity numbers</th>
+    </tr>
+    <tr>
+        <th>Relevance</th>
+        <th>int</th>
+        <th>Relevance numbers</th>
+    </tr>
+    <tr>
+        <th>Engagement</th>
+        <th>int</th>
+        <th>Engagement numbers</th>
+    </tr>
+    <tr>
+        <th>Location</th>
+        <th>string</th>
+        <th>Influencer location</th>
+    </tr>
+    <tr>
+        <th>Tags</th>
+        <th>Array of strings</th>
+        <th>Stores hashtags</th>
+        </tr>
+</table>
+<pre>
+    <code>
+{
+    "Influencer": {
+        "Listing": {
+            "influencerID": "1",
+            "influencerName": "parmdhaliwal4",
+            "influcnerURL": "instagram.com/parmdhaliwal4"
+            "Profile": {
+                "Followers": "589",
+                "Following": "176",
+                "Posts": "221"
+            },
+            "Metrics": {
+                "Activity": "87.5",
+                "Relevance": "50.0",
+                "Engagement": "300"
+            }
+        },   
+        "Location": "Surrey",
+        "Tags": ["string", "string", "string"]
+    }
+}
+    </code>
+</pre>
+
+<h3>Get influencer</h3>
+
+GET/influencers/{influencer.influencerID}
+<br>Get an influencer by ID. Returns an influencer object.</br>
+
+<h2>Accounts</h2>
+<table>
+    <tr>
+        <th><h3>Field</h3></th>
+        <th><h3>Type</h3></th>
+        <th><h3>Description</h3></th>
+    </tr>
+    <tr>
+        <th>accountID</th>
+        <th>int</th>
+        <th>ID of account</th>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <th>String</th>
+        <th>Email for account</th>
+    </tr>
+    <tr>
+        <th>Password</th>
+        <th>string</th>
+        <th>Password for account</th>
+    </tr>
+    <tr>
+        <th>Admin</th>
+        <th>boolean</th>
+        <th>Determines if an account is an admin</th>
+    </tr>
+</table>
+<pre>
+    <code>
+{
+    "id": "something", //randomly generated ID?
+    "Email": "yeet@yeet.com",
+    "Password": "ihuad98U29*D",
+    "Admin" : "true"
+}
+             
+    </code>
+</pre>
+
+<h3>Update account</h3>
+PUT / ACCOUNTS/ account.accountID
+
+<br>Return successful or failed account update</br>
+
+<h3>POST</h3>
+POST / Accounts /
+
+<br>Return successful or failed account creation</br>
+</body>
+
+
+</html>
