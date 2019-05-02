@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../config/database').db;
-var firebase = require('../config/database').firebase;
+var passport = require('../config/passport');
 
 router.get('/', async(req, res, next) => {
 	try {
@@ -20,4 +20,12 @@ router.get('/', async(req, res, next) => {
 	}
 
 });
+
+router.post('/', 
+  passport.authenticate('adminbearer', { session: false }), 
+  async(req, res, next) => {
+    res.send(req.body)
+  }
+);
+
 module.exports = router;
