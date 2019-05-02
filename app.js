@@ -19,9 +19,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
+app.use(express.static(path.join(__dirname, 'docs')));
 app.use('/v0/accounts', accountsRouter);
 app.use('/v0/auth', auth);
 app.use('/v0/influencers', influencerrouter)

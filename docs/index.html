@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 
 <html lang="en">
 <head>
@@ -29,91 +29,112 @@
         <th><h3>Description</h3></th>
     </tr>
     <tr>
-        <th>influencerID</th>
-        <th>int</th>
-        <th>Uniqie ID for influencer</th>
+        <th>id</th>
+        <th>Number</th>
+        <th>Generated ID for influencer</th>
     </tr>
     <tr>
-        <th>influencerName</th>
-        <th>string</th>
+        <th>name</th>
+        <th>String</th>
         <th>Name of instagram account</th>
     </tr>
     <tr>
-        <th>influencerURL</th>
-        <th>string</th>
+        <th>url</th>
+        <th>Number</th>
         <th>URL of influencer's instagram account</th>
     </tr>
     <tr>
         <th>Followers</th>
-        <th>int</th>
+        <th>Number</th>
         <th>Number of followers</th>
     </tr>
     <tr>
         <th>Following</th>
-        <th>int</th>
-        <th>Number that they follow</th>
+        <th>Number</th>
+        <th>Number of instagram users that they follow</th>
     </tr>
     <tr>
         <th>Posts</th>
-        <th>int</th>
+        <th>Number</th>
         <th>Number of posts the user has made</th>
     </tr>
     <tr>
         <th>Activity</th>
-        <th>int</th>
-        <th>Activity numbers</th>
+        <th>Number</th>
+        <th>Generated activity score</th>
     </tr>
     <tr>
         <th>Relevance</th>
-        <th>int</th>
-        <th>Relevance numbers</th>
+        <th>Number</th>
+        <th>Relevance score as per user if they are logged in</th>
     </tr>
     <tr>
         <th>Engagement</th>
-        <th>int</th>
-        <th>Engagement numbers</th>
+        <th>Number</th>
+        <th>Engagement score of particular influencer</th>
     </tr>
     <tr>
         <th>Location</th>
         <th>string</th>
-        <th>Influencer location</th>
+        <th>Influencer area of influence</th>
     </tr>
     <tr>
-        <th>Tags</th>
-        <th>Array of strings</th>
-        <th>Stores hashtags</th>
+        <th>Weights</th>
+        <th>Object of keywords</th>
+        <th>Store of relevant keywords with weight associated with keyword</th>
         </tr>
 </table>
+    <h2>
+        Influencer JSON schema
+    </h2>
 <pre>
     <code>
-{
-    "Influencer": {
-        "Listing": {
-            "influencerID": "1",
-            "influencerName": "parmdhaliwal4",
-            "influcnerURL": "instagram.com/parmdhaliwal4"
-            "Profile": {
-                "Followers": "589",
-                "Following": "176",
-                "Posts": "221"
-            },
-            "Metrics": {
-                "Activity": "87.5",
-                "Relevance": "50.0",
-                "Engagement": "300"
+    [
+        {
+        "id": String,
+        "name": String,
+        "url": String,
+        "followers": Number,
+        "following": Number,
+        "posts": Number,
+        "activity": Number,
+        "relevance": Number,
+        "engagement": Number,
+        "valuation": Number,
+        "location": String,
+        "description": String,
+        "weights": {
+            "keyword": Number,
+            .
+            .
             }
-        },   
-        "Location": "Surrey",
-        "Tags": ["string", "string", "string"]
-    }
-}
+        }
+    ]
     </code>
 </pre>
 
-<h3>Get influencer</h3>
+<h2>API Routes</h2>
 
-GET/influencers/{influencer.influencerID}
-<br>Get an influencer by ID. Returns an influencer object.</br>
+<p>
+    Server: api.influxapp.ca<br />
+    url: /v0/<br /><br />
+    Influencers GET: /influencers<br />
+    Parameters: (Optional) A string with keywords delimited by spaces </br>
+    Headers: (Optional) Authorization bearer header containing idtoken associated with logged in user</br>
+    Response: JSON array of influencers</br>
+
+    <br />
+    Influencers POST: /influencers <br />
+    Parameters: (Required) JSON object of the influencer minus ID and relevance <br />
+    Headers: (Required) Authorization bearer header containing token <br />
+    Response: 201 Successful creation of resource, JSON array of influencer minus relevance<br />
+    <br />
+    Accounts GET: In development <br /> <br />
+    Accounts POST: In development <br /> <br />
+    Auth POST: In development <br /> <br />
+
+
+</p>
 
 <h2>Accounts</h2>
 <table>
