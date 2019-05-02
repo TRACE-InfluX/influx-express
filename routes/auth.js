@@ -21,7 +21,7 @@ router.post('/', async (req, res, next) => {
 
   const errors = check_for_errors(req.body, required)
 
-  if (errors !== {}) {
+  if (Object.keys(errors).length) {
     return res.status(422).json({errors})
   }
 

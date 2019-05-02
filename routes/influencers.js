@@ -25,7 +25,7 @@ router.get('/', async(req, res, next) => {
 
 router.post('/', 
   passport.authenticate('adminbearer', { session: false }), 
-  async(req, res, next) => {
+  async (req, res, next) => {
 
     // Check JSON
     if (req.headers["content-type"] !== "application/json") {
