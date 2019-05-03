@@ -3,6 +3,7 @@ var router = express.Router();
 var db = require('../config/database').db;
 var firebase = require('../config/database').firebase;
 var admin = require("../config/database").admin;
+var check_for_errors = require('../config/validation');
 
 if(!admin.apps.length){
   admin.initializeApp({
@@ -13,27 +14,30 @@ if(!admin.apps.length){
 
 router.post('/', async (req, res, next) => {
 
-    if (!req.body.email) {
-      return res.status(400).json({ error: 'missing email' });
-    }
+  const required = {
+    "email": String(),
+    "password": String()
+  }
 
-    if (!req.body.password) {
-      return res.status(400).json({ error: 'missing password' });
-    }
+  const errors = check_for_errors(req.body, required)
 
-    try {
-      let resfb   = await firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
-      let idToken = await resfb.user.getIdToken();
-      let record  = await admin.auth().getUser(resfb.user.uid)
-      let adminStatus   = false;
-      if (record.customClaims) {
-          adminStatus = record.customClaims.admin;
-      }
-      res.send({ message: 'Logged in!', idToken, admin: adminStatus }); 
+  if (Object.keys(errors).length) {
+    return res.status(422).json({errors})
+  }
+
+  try {
+    let resfb   = await firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
+    let idToken = await resfb.user.getIdToken();
+    let record  = await admin.auth().getUser(resfb.user.uid)
+    let adminStatus   = false;
+    if (record.customClaims) {
+        adminStatus = record.customClaims.admin;
     }
-    catch (error) {
-      res.status(401).json({error})
-    }
+    res.send({ message: 'Logged in!', idToken, admin: adminStatus }); 
+  }
+  catch (error) {
+    res.status(401).json({error})
+  }
     
 });
 
