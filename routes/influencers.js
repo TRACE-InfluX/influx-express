@@ -11,7 +11,8 @@ router.get('/', async(req, res, next) => {
 		let influencers = [];
 		snapshot.forEach(item => {
 			let each = item.val()
-			each.id = item.key
+      each.id = item.key
+      each.relevance = calculate_relevance()
 			influencers.push(each);
 		});
 
@@ -22,6 +23,11 @@ router.get('/', async(req, res, next) => {
 	}
 
 });
+
+function calculate_relevance() {
+  //TODO
+  return 1
+}
 
 router.post('/', 
   passport.authenticate('adminbearer', { session: false }), 
