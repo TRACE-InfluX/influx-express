@@ -44,42 +44,47 @@
         <th>URL of influencer's instagram account</th>
     </tr>
     <tr>
-        <th>Followers</th>
+        <th>profile_image</th>
+        <th>String</th>
+        <th>URL of the influencer's profile image</th>
+    </tr>
+    <tr>
+        <th>followers</th>
         <th>Number</th>
         <th>Number of followers</th>
     </tr>
     <tr>
-        <th>Following</th>
+        <th>following</th>
         <th>Number</th>
         <th>Number of instagram users that they follow</th>
     </tr>
     <tr>
-        <th>Posts</th>
+        <th>posts</th>
         <th>Number</th>
         <th>Number of posts the user has made</th>
     </tr>
     <tr>
-        <th>Activity</th>
+        <th>activity</th>
         <th>Number</th>
         <th>Generated activity score</th>
     </tr>
     <tr>
-        <th>Relevance</th>
+        <th>relevance</th>
         <th>Number</th>
         <th>Relevance score as per user if they are logged in</th>
     </tr>
     <tr>
-        <th>Engagement</th>
+        <th>engagement</th>
         <th>Number</th>
         <th>Engagement score of particular influencer</th>
     </tr>
     <tr>
-        <th>Location</th>
+        <th>location</th>
         <th>string</th>
         <th>Influencer area of influence</th>
     </tr>
     <tr>
-        <th>Weights</th>
+        <th>weights</th>
         <th>Object of keywords</th>
         <th>Store of relevant keywords with weight associated with keyword</th>
         </tr>
@@ -94,6 +99,7 @@
         "id": String,
         "name": String,
         "url": String,
+        "profile_image": String,
         "followers": Number,
         "following": Number,
         "posts": Number,
@@ -105,8 +111,7 @@
         "description": String,
         "weights": {
             "keyword": Number,
-            .
-            .
+            ...
             }
         }
     ]
