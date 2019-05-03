@@ -53,7 +53,16 @@ router.post('/',
       return res.status(422).json({errors})
     }
 
-    return res.send({msg: "Valid Input"})
+    try {
+      let fbref = await db.ref('/influencers').push(req.body)
+      let snapshot = await fbref.once('value')
+      let created_influencer = snapshot.val()
+      created_influencer.id = fbref.key
+      return res.status(202).json(created_influencer)
+    }
+    catch (error) {
+      res.status(500).json({error})
+    }
 
   }
 );
