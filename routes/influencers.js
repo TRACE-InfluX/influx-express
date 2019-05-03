@@ -41,6 +41,7 @@ router.post('/',
     // Required Fields
     const required = {
       "name": String(),
+      "username": String(),
       "url": String(),
       "profile_image": String(),
       "description": String(),
