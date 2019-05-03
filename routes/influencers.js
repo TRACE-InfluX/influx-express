@@ -42,6 +42,7 @@ router.post('/',
     const required = {
       "name": String(),
       "url": String(),
+      "profile_image": String(),
       "description": String(),
       "location": String(),
       "followers": Number(),
