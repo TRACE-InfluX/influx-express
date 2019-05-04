@@ -52,7 +52,7 @@ router.post('/',
       "activity": Number(),
       "engagement": Number(),
       "valuation": Number(),
-      "weights": {}
+      "weights": String()
     }
     
     const errors = check_for_errors(req.body, required)
