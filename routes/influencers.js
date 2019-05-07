@@ -96,8 +96,13 @@ router.post('/',
         res.status(500).send(error)
       }
     } else {
-      let userref = '/influencers' + result.uid;
-      await db.ref(userref).update(req.body)
+      try {
+        let userref = '/influencers/' + result.uid;
+        await db.ref(userref).update(req.body)
+        res.status(202).send({ message: "updated user: " + req.body.name })
+      } catch (error){
+        res.status(500).send(error)
+      }    
     }
   }
 );
