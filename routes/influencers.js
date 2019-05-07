@@ -15,9 +15,11 @@ router.get('/', async(req, res, next) => {
             each.id = item.key
             each.relevance = calculate_relevance()
 			influencers.push(each);
-		});
+        });
+        checkuserexists('@serotoninplus')
         influencers.reverse()
-		res.send(influencers);
+        res.send(influencers);
+
   } 
   catch (error) {
 		res.status(500).json({error});
@@ -56,7 +58,7 @@ router.post('/',
     }
     
     const errors = check_for_errors(req.body, required)
-
+    
     if (Object.keys(errors).length) {
       return res.status(422).json({errors})
     }
@@ -74,5 +76,17 @@ router.post('/',
 
   }
 );
+
+async function checkuserexists(username) {
+    let ref = db.ref('/influencers')
+    let snapshot = await ref.once('value')
+    let influencernames = {}
+    snapshot.forEach(item => {
+        influencernames[item.val().username]
+    });
+    console.log(influencernames)
+    return(influencernames[username])
+
+}
 
 module.exports = router;

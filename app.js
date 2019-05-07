@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 var accountsRouter = require('./routes/accounts');
 var auth = require('./routes/auth');
 var influencerrouter = require('./routes/influencers');
-
+var popular = require('./routes/popular');
 
 var app = express();
 var passport = require('passport');
@@ -23,4 +23,5 @@ app.use(express.static(path.join(__dirname, 'docs')));
 app.use('/v0/accounts', accountsRouter);
 app.use('/v0/auth', auth);
 app.use('/v0/influencers', influencerrouter)
+app.use('/v0/popular', popular)
 module.exports = app;
