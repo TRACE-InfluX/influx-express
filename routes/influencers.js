@@ -16,12 +16,12 @@ router.get('/popular', async (req, res, next) => {
             each.relevance = calculate_relevance()
             influencers.push(each);
         });
-        influencers.reverse()
-        res.send(influencers);
+      influencers.reverse()
+      res.send(influencers);
     }
     catch (error) {
         console.log(error)
-        res.status(500).json({ error });
+        res.status(500).send(error);
     }
 });
 
@@ -37,13 +37,12 @@ router.get('/', async(req, res, next) => {
             each.relevance = calculate_relevance()
 			influencers.push(each);
         });
-        checkuserexists('@serotoninplus')
         influencers.reverse()
         res.send(influencers);
 
   } 
   catch (error) {
-		res.status(500).json({error});
+		res.status(500).send(error);
 	}
 });
 
@@ -82,33 +81,42 @@ router.post('/',
     const errors = check_for_errors(req.body, required)
     
     if (Object.keys(errors).length) {
-      return res.status(422).json({errors})
+      return res.status(422).send(errors)
     }
-
-    try {
-      let fbref = await db.ref('/influencers').push(req.body)
-      let snapshot = await fbref.once('value')
-      let created_influencer = snapshot.val()
-      created_influencer.id = fbref.key
-      return res.status(202).json(created_influencer)
+    result = await checkuserexists(req.body.username)
+    if (!result) {
+      try {
+        let fbref = await db.ref('/influencers').push(req.body)
+        let snapshot = await fbref.once('value')
+        let created_influencer = snapshot.val()
+        created_influencer.id = fbref.key
+        return res.status(202).json(created_influencer)
+      }
+      catch (error) {
+        res.status(500).send(error)
+      }
+    } else {
+      let userref = '/influencers' + result.uid;
+      await db.ref(userref).update(req.body)
     }
-    catch (error) {
-      res.status(500).json({error})
-    }
-
   }
 );
 
-//async function checkuserexists(username) {
-//    let ref = db.ref('/influencers')
-//    let snapshot = await ref.once('value')
-//    let influencernames = {}
-//    snapshot.forEach(item => {
-//        influencernames.
-//    });
-//    console.log(influencernames)
-//    return(influencernames[username])
+async function checkuserexists(username) {
+    let ref = db.ref('/influencers')
+    let snapshot = await ref.once('value')
+    let influencernames = {}
+    snapshot.forEach((item) => {
+        name = item.val().username
+        influencernames[name] = item.key
+    });
+  if (username in influencernames) {
+    console.log(influencernames[username])
+    return {
+      uid: influencernames[username],
+      username: username}
+  } else { return false}
 
-//}
+}
 
 module.exports = router;
