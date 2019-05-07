@@ -13,7 +13,6 @@ router.get('/popular', async (req, res, next) => {
   filePath = path.join(__dirname, '../config/data.json')
   fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
     if (!err) {
-      console.log("parsing JSON");
       influencerdata = JSON.parse(data);
       influencers = influencerdata.influencers;
       let result = []
@@ -51,7 +50,6 @@ router.get('/', async (req, res, next) => {
     filePath = path.join(__dirname, '../config/data.json')
     fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
       if (!err) {
-        console.log("parsing JSON");
         influencerdata = JSON.parse(data);
         influencers = influencerdata.influencers;
         let result = []
@@ -145,7 +143,6 @@ async function checkuserexists(username) {
     influencernames[name] = item.key
   });
   if (username in influencernames) {
-    console.log(influencernames[username])
     return {
       uid: influencernames[username],
       username: username
