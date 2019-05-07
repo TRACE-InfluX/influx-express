@@ -4,6 +4,27 @@ var db = require('../config/database').db;
 var passport = require('../config/passport');
 var check_for_errors = require('../config/validation');
 
+router.get('/popular', async (req, res, next) => {
+    try {
+        let influencers_ref = db.ref('/influencers')
+        let snapshot = await influencers_ref.orderByChild('followers').limitToLast(4).once('value');
+
+        let influencers = [];
+        snapshot.forEach(item => {
+            let each = item.val()
+            each.id = item.key
+            each.relevance = calculate_relevance()
+            influencers.push(each);
+        });
+        influencers.reverse()
+        res.send(influencers);
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).json({ error });
+    }
+});
+
 router.get('/', async(req, res, next) => {
     try {
         let influencers_ref = db.ref('/influencers')
@@ -25,6 +46,7 @@ router.get('/', async(req, res, next) => {
 		res.status(500).json({error});
 	}
 });
+
 
 function calculate_relevance() {
   //TODO
@@ -77,16 +99,16 @@ router.post('/',
   }
 );
 
-async function checkuserexists(username) {
-    let ref = db.ref('/influencers')
-    let snapshot = await ref.once('value')
-    let influencernames = {}
-    snapshot.forEach(item => {
-        influencernames[item.val().username]
-    });
-    console.log(influencernames)
-    return(influencernames[username])
+//async function checkuserexists(username) {
+//    let ref = db.ref('/influencers')
+//    let snapshot = await ref.once('value')
+//    let influencernames = {}
+//    snapshot.forEach(item => {
+//        influencernames.
+//    });
+//    console.log(influencernames)
+//    return(influencernames[username])
 
-}
+//}
 
 module.exports = router;
