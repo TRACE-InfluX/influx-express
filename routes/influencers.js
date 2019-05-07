@@ -18,7 +18,7 @@ router.get('/popular', async (req, res, next) => {
       influencers = influencerdata.influencers;
       let result = []
       for (i in influencers) {
-        influencers[i].relevance = 1
+        influencers[i].relevance = 100
         result.push(influencers[i])
       }
 
@@ -56,9 +56,12 @@ router.get('/', async (req, res, next) => {
         influencers = influencerdata.influencers;
         let result = []
         for (i in influencers) {
-          influencers[i].relevance = 1
+          influencers[i].relevance = 100
           result.push(influencers[i])
         }
+        result.sort((a, b) => {
+          return b.engagement - a.engagement
+        });
         res.send(result)
       } else {
         console.log(err);
