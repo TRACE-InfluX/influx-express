@@ -5,23 +5,23 @@ var passport = require('../config/passport');
 var check_for_errors = require('../config/validation');
 
 router.get('/', async(req, res, next) => {
-	try {
-		let snapshot = await db.ref('/influencers').once('value');
+    try {
+        let influencers_ref = db.ref('/influencers')
+		let snapshot = await influencers_ref.orderByChild('engagement').once('value');
 		
 		let influencers = [];
 		snapshot.forEach(item => {
 			let each = item.val()
-      each.id = item.key
-      each.relevance = calculate_relevance()
+            each.id = item.key
+            each.relevance = calculate_relevance()
 			influencers.push(each);
 		});
-
+        influencers.reverse()
 		res.send(influencers);
   } 
   catch (error) {
 		res.status(500).json({error});
 	}
-
 });
 
 function calculate_relevance() {
