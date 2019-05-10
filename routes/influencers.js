@@ -1,6 +1,6 @@
 var express = require('express')
 var router = express.Router()
-var db = require('../db')
+var db = require('../database')
 var authorize = require('../auth/token')
 var validate = require('../validation')
 var influencer = require('../models/influencer')

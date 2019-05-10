@@ -21,4 +21,8 @@ app.use(express.static(path.join(__dirname, 'docs')))
 app.use('/v0/accounts', accountsRouter)
 app.use('/v0/auth', auth)
 app.use('/v0/influencers', influencerrouter)
+
+var notifications = require('./notifications')
+notifications.send('Success', 'Server Online')
+
 module.exports = app
