@@ -82,8 +82,11 @@ var influencer = require('../models/influencer')
 
 router.post('/',
   authorize('admin'),
-  validate(influencer),
+  //validate(influencer),
   async (req, res) => {
+
+    return res.send(req.user)
+
     result = await checkuserexists(req.body.username)
     if (!result) {
       try {
