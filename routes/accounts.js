@@ -18,7 +18,7 @@ router.post('/',
       return res.send({ message: 'Signed up!', token })
     }
     catch (error) {
-      return res.status(400).send(error)
+      return res.status(401).send(error)
     }
 
   }
