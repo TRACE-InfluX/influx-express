@@ -22,7 +22,15 @@ app.use('/v0/accounts', accountsRouter)
 app.use('/v0/auth', auth)
 app.use('/v0/influencers', influencerrouter)
 
-var notifications = require('./notifications')
-notifications.send('Success', 'Server Online')
+var log = require('./notifications')
+log.success('Server Online')
+
+var weights = require('./database/weights')
+weights.get().then(res => { 
+  log.info(res) 
+})
+.catch(err => {
+  log.error(err + ' (in app.js)')
+})
 
 module.exports = app
