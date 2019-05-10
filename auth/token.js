@@ -15,7 +15,7 @@ passport.use('admin', new BearerStrategy(
 
       } else {
         //returns a 401 if second argument is false
-        return done({ error : 'Unauthorized' }, false)
+        return done({ message : 'Unauthorized' }, false)
       }
     }
     catch(error) {

@@ -3,7 +3,7 @@ module.exports = function({required, optional = {}}) {
   return (req, res, next) => {
 
     if (req.headers['content-type'] !== 'application/json') {
-      return res.status(400).send({ error: 'Expected Header - Content-Type: application/json' })
+      return res.status(400).send({ message: 'Expected Header - Content-Type: application/json' })
     }
   
     let errors = {}
@@ -40,7 +40,7 @@ module.exports = function({required, optional = {}}) {
     }
     
     if (Object.keys(errors).length) {
-      return res.status(422).send({errors})
+      return res.status(422).send(errors)
     }
     next()
   }
