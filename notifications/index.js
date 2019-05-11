@@ -16,7 +16,8 @@ let send = (level, msg) => {
     size: 2
   }
 
-  msg = typeof msg == 'object' ? '```JSON\n' + format(msg, options) + '```':
+  msg = typeof msg === 'error' ? msg.message:
+        typeof msg === 'object' ? '```JSON\n' + format(msg, options) + '```':
         msg.toString()
 
   let data = {
@@ -24,17 +25,30 @@ let send = (level, msg) => {
     embeds:[{
       title: `${level} - from ${config.server}`,
       type: 'rich',
-      description: msg.toString(),
+      description: msg,
       color
     }]
   }
-  if (config.enable.includes(level)) axios.post(config.url, data)
+  if (config.enable.includes(level)) axios.post(config.url, data).catch()
 }
 
 module.exports = {
   send,
-  error:   msg =>{ send('Error', msg) },
-  warning: msg =>{ send('Warning', msg) },
-  info:    msg =>{ send('Info', msg) },
-  success: msg =>{ send('Success', msg) },
+  error: (error, next) => {
+    if (next) {
+      if (error.trace) {
+        error.trace.push(next)
+        throw error
+      }
+      else {
+        throw { error, trace: [next] }
+      }
+    }
+    else {
+      send('Error', error)
+    }
+  },
+  warning: msg => { send('Warning', msg) },
+  info:    msg => { send('Info', msg) },
+  success: msg => { send('Success', msg) },
 }

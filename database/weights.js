@@ -4,7 +4,6 @@ var db  = require('../database')
 module.exports = {
   async get() {
     try {
-
       let args = Array.prototype.slice.call(arguments)
       let keys = []
       if (typeof args[0] == 'string') {
@@ -44,8 +43,7 @@ module.exports = {
       return result
     }
     catch (error) {
-      log.error(error + ' (in ../database/weights.get/1)')
-      throw error
+      log.error(error, { in: '../database/weights.get/1' })
     }
   },
   async add(keys) {

@@ -17,8 +17,7 @@ module.exports = {
       return client.db(database.name).collection(collection)
     }
     catch(error) {
-      log.error(error + ' (in ../database)')
-      throw error
+      log.error(error, { in: '../database', msg: 'DB Connection Error' })
     }
   }
 }
