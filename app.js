@@ -27,9 +27,6 @@ module.exports = (async function(){
     var log = require('./notifications')
     log.success('Server Online')
     
-    var weights = require('./database/weights')
-    await weights.get('test')
-    
     return app
   }
   catch(error) {

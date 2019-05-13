@@ -35,7 +35,6 @@ module.exports = {
       const data = await weights.find(query, { projection }).toArray()
 
       let result = {}
-
       for (let weight of data) {
         result[weight.key] = weight.count
       }
