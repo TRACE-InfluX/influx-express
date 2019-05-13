@@ -2,98 +2,110 @@
 
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
+    <title>Documentation</title>
+    <meta name="description" content="The HTML5 Herald">
+    <style>
 
-  <title>Documentation</title>
-  <meta name="description" content="The HTML5 Herald">
-
-  <style>
-       table, th, td{
-           color:#575757;
+        table, th, td {
+            color: #575757;
             border: 1px solid black;
             border-collapse: collapse;
-            text-align:left;
-            font-family:arial;
+            text-align: left;
+            font-family: arial;
         }
-</style>
-
+    </style>
 </head>
-
 <body>
     <H1>Influx Documentation</H1>
-    <H2>Influencers</H2>
-<table>
-    <tr>
-        <th><h3>Field</h3></th>
-        <th><h3>Type</h3></th>
-        <th><h3>Description</h3></th>
-    </tr>
-    <tr>
-        <th>id</th>
-        <th>Number</th>
-        <th>Generated ID for influencer</th>
-    </tr>
-    <tr>
-        <th>name</th>
-        <th>String</th>
-        <th>Real Name of the influencer account</th>
-    </tr>
-    <tr>
-        <th>username</th>
-        <th>String</th>
-        <th>Social Media profile tag</th>
-    </tr>
-    <tr>
-        <th>url</th>
-        <th>Number</th>
-        <th>URL of influencer's instagram account</th>
-    </tr>
-    <tr>
-        <th>profile_image</th>
-        <th>String</th>
-        <th>URL of the influencer's profile image</th>
-    </tr>
-    <tr>
-        <th>followers</th>
-        <th>Number</th>
-        <th>Number of followers</th>
-    </tr>
-    <tr>
-        <th>following</th>
-        <th>Number</th>
-        <th>Number of instagram users that they follow</th>
-    </tr>
-    <tr>
-        <th>posts</th>
-        <th>Number</th>
-        <th>Number of posts the user has made</th>
-    </tr>
-    <tr>
-        <th>activity</th>
-        <th>Number</th>
-        <th>Generated activity score</th>
-    </tr>
-    <tr>
-        <th>relevance</th>
-        <th>Number</th>
-        <th>Relevance score as per user if they are logged in</th>
-    </tr>
-    <tr>
-        <th>engagement</th>
-        <th>Number</th>
-        <th>Engagement score of particular influencer</th>
-    </tr>
-    <tr>
-        <th>location</th>
-        <th>string</th>
-        <th>Influencer area of influence</th>
-    </tr>
-    <tr>
-        <th>weights</th>
-        <th>Base64 String Encoded Object</th>
-        <th>Store of relevant keywords with weight associated with keyword</th>
+    <H2>DB structure</H2>
+    <table>
+        <tr>
+            <th><h3>Field</h3></th>
+            <th><h3>Type</h3></th>
+            <th><h3>Description</h3></th>
         </tr>
-</table>
+        <tr>
+            <th>id</th>
+            <th>Number</th>
+            <th>Generated ID for influencer</th>
+        </tr>
+        <tr>
+            <th>name</th>
+            <th>String</th>
+            <th>Real Name of the influencer account</th>
+        </tr>
+        <tr>
+            <th>username</th>
+            <th>String</th>
+            <th>Social Media profile tag</th>
+        </tr>
+        <tr>
+            <th>url</th>
+            <th>String</th>
+            <th>URL of influencer's instagram account</th>
+        </tr>
+        <tr>
+            <th>profile_image</th>
+            <th>String</th>
+            <th>URL of the influencer's profile image</th>
+        </tr>
+        <tr>
+            <th>followers</th>
+            <th>Number</th>
+            <th>Number of followers</th>
+        </tr>
+        <tr>
+            <th>following</th>
+            <th>Number</th>
+            <th>Number of instagram users that they follow</th>
+        </tr>
+        <tr>
+            <th>num_posts</th>
+            <th>Number</th>
+            <th>Number of posts the user has made</th>
+        </tr>
+        <tr>
+            <th>activity</th>
+            <th>Number</th>
+            <th>Generated activity percentile value</th>
+        </tr>
+        <tr>
+            <th>relevance</th>
+            <th>Number</th>
+            <th>Generated activity percentile value</th>
+        </tr>
+        <tr>
+            <th>engagement</th>
+            <th>Number</th>
+            <th>Generated engagement percentile score</th>
+        </tr>
+        <tr>
+            <th>location</th>
+            <th>string</th>
+            <th>Influencer area of influence</th>
+        </tr>
+        <tr>
+            <th>reach</th>
+            <th>Number</th>
+            <th>Reach score of a particular influencer(probably as a percentile)</th>
+        </tr>
+        <tr>
+            <th>conversion</th>
+            <th>Number</th>
+            <th>Conversion score of a particular influencer</th>
+        </tr>
+        <tr>
+            <th>Cost</th>
+            <th>Number</th>
+            <th>Estimated cost of a particular influencer</th>
+        </tr>
+        <tr>
+            <th>posts</th>
+            <th>Array of Strings</th>
+            <th>Array containing most recent post ids of an influencer (12 or less)</th>
+        </tr>
+    </table>
     <h2>
         Influencer JSON schema
     </h2>
@@ -108,70 +120,71 @@
         "profile_image": String,
         "followers": Number,
         "following": Number,
-        "posts": Number,
+        "num_posts": Number,
         "activity": Number,
         "relevance": Number,
         "engagement": Number,
-        "valuation": Number,
         "location": String,
+        "reach": Number,
+        "conversion": Number,
+        "cost": Number,
         "description": String,
-        "weights": Base64Object
+        "posts": [
+            "postid": String
+            ]
         }
     ]
     </code>
 </pre>
+    <h2>API Routes</h2>
+    <p>
+        Server: api.influxapp.ca<br />
+        url: /v0/<br /><br />
+        Influencers GET: /influencers<br />
+        Parameters: (Optional) A string with keywords delimited by spaces </br>
+        Headers: (Optional) Authorization bearer header containing idtoken associated with logged in user</br>
+        Response: JSON array of influencers</br>
 
-<h2>API Routes</h2>
-
-<p>
-    Server: api.influxapp.ca<br />
-    url: /v0/<br /><br />
-    Influencers GET: /influencers<br />
-    Parameters: (Optional) A string with keywords delimited by spaces </br>
-    Headers: (Optional) Authorization bearer header containing idtoken associated with logged in user</br>
-    Response: JSON array of influencers</br>
-
-    <br />
-    Influencers POST: /influencers <br />
-    Parameters: (Required) JSON object of the influencer minus ID and relevance <br />
-    Headers: (Required) Authorization bearer header containing token <br />
-    Response: 201 Successful creation of resource, JSON array of influencer minus relevance<br />
-    <br />
-    Accounts GET: In development <br /> <br />
-    Accounts POST: In development <br /> <br />
-    Auth POST: In development <br /> <br />
-
-
-</p>
-
-<h2>Accounts</h2>
-<table>
-    <tr>
-        <th><h3>Field</h3></th>
-        <th><h3>Type</h3></th>
-        <th><h3>Description</h3></th>
-    </tr>
-    <tr>
-        <th>accountID</th>
-        <th>int</th>
-        <th>ID of account</th>
-    </tr>
-    <tr>
-        <th>Email</th>
-        <th>String</th>
-        <th>Email for account</th>
-    </tr>
-    <tr>
-        <th>Password</th>
-        <th>string</th>
-        <th>Password for account</th>
-    </tr>
-    <tr>
-        <th>Admin</th>
-        <th>boolean</th>
-        <th>Determines if an account is an admin</th>
-    </tr>
-</table>
+        <br />
+        Influencers POST: /influencers <br />
+        Parameters: (Required) JSON object of the influencer <br />
+        Headers: (Required) Authorization bearer header containing token <br />
+        Response: 201 Successful creation of resource, JSON object containing influencer ID<br />
+        <br />
+        Influencers GET: /influencers/{id} <br />
+        Parameters: (Required) ID of the influencer in a JSON with key "id" <br />
+        Headers: (Required) Authorization bearer header containing token <br />
+        Response: 201 Successful creation of resource, JSON object containing influencer ID<br />
+        <br />
+    </p>
+    <h2>Accounts</h2>
+    <table>
+        <tr>
+            <th><h3>Field</h3></th>
+            <th><h3>Type</h3></th>
+            <th><h3>Description</h3></th>
+        </tr>
+        <tr>
+            <th>accountID</th>
+            <th>int</th>
+            <th>ID of account</th>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <th>String</th>
+            <th>Email for account</th>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <th>string</th>
+            <th>Password for account</th>
+        </tr>
+        <tr>
+            <th>Admin</th>
+            <th>boolean</th>
+            <th>Determines if an account is an admin</th>
+        </tr>
+    </table>
 <pre>
     <code>
 {
@@ -183,17 +196,82 @@
              
     </code>
 </pre>
+    <h3>Update account</h3>
+    PUT / ACCOUNTS/ account.accountID
 
-<h3>Update account</h3>
-PUT / ACCOUNTS/ account.accountID
+    <br>Return successful or failed account update</br>
 
-<br>Return successful or failed account update</br>
+    <h3>POST</h3>
+    POST / Accounts /
 
-<h3>POST</h3>
-POST / Accounts /
+    <br>Return successful or failed account creation</br>
 
-<br>Return successful or failed account creation</br>
+    <h3>DB structure for reference</h3>
+    <pre>
+<code>
+    DB: {
+        influencer_count: Number,
+        influencers_by_engagement: [{
+                "influencer_id": String,
+                "raw_engagement": Number
+            }
+        ],
+        "influencers_by_activity": [{
+                "influencer_id": String,
+                "raw_activity": Number
+            }
+        ],
+        "influencers_by_followers": [{
+                "influencer_id": String,
+                "followers": Number
+            }
+        ],
+        "weights_index": {
+            "key_word": [
+            "influencer_id": String
+            ],
+        },
+        "global_weights": {
+            "key_word": Number
+        },
+        "accounts": {
+            "account_id": String,
+            "profiles:" [
+                "profile_id": String
+            ],
+            "username": String,
+            "e-mail": String,
+            "first_name": String,
+            "last_name": String
+        },
+        profiles: {
+            "profile_id": String,
+            "influencers_by_relevance": [
+                "influencer_id": String
+            ]
+        },
+        "influencers": [{
+                "influencer_id": String,
+                "username": String,
+                "url": String,
+                "raw_engagement": Number,
+                "raw_activity": Number,
+                "num_posts": Number,
+                "followers": Number,
+                "following": Number,
+                "profile_image": String,
+                "name": String
+                "raw_reach": Number,
+                "raw_cost": Number,
+                "raw_conversion": Number,
+                "posts": [
+                    "post_id": String
+                ]
+            }
+        ]
+    }
+</code>
+</pre>
 </body>
-
 
 </html>
