@@ -25,7 +25,6 @@ module.exports = {
       else if (args[0]) {
         keys = Object.keys(args[0])
       }
-
       let query = {
         $or: keys.map(k => { return { key : k } })
       }
