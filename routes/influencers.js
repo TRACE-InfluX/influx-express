@@ -4,75 +4,80 @@ var db = require('../database')
 var authorize = require('../auth/token')
 var validate = require('../validation')
 var influencer = require('../models/influencer')
+var log = require('../notifications')
 
-// router.get('/popular', async (req, res, next) => {
+// temp imports
+var fs = require('fs')
+var path = require('path')
+
+ router.get('/popular', async (req, res, next) => {
   
-//     //let influencers_ref = db.ref('/influencers')
-//     //let snapshot = await influencers_ref.orderByChild('followers').limitToLast(4).once('value');
-//   filePath = path.join(__dirname, '../config/data.json')
-//   fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-//     if (!err) {
-//       influencerdata = JSON.parse(data);
-//       influencers = influencerdata.influencers;
-//       let result = []
-//       for (i in influencers) {
-//         influencers[i].relevance = 100
-//         influencers[i].id = i
-//         result.push(influencers[i])
-//       }
+     //let influencers_ref = db.ref('/influencers')
+     //let snapshot = await influencers_ref.orderByChild('followers').limitToLast(4).once('value');
+   filePath = path.join(__dirname, '../config/data.json')
+   fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
+     if (!err) {
+       influencerdata = JSON.parse(data);
+       influencers = influencerdata.influencers;
+       let result = []
+       for (i in influencers) {
+         influencers[i].relevance = 100
+         influencers[i].id = i
+         result.push(influencers[i])
+       }
 
-//       result.sort((a, b) => {
-//         return b.followers - a.followers;
-//       });
-//       final_result = []
-//       final_result.push(result[0], result[1], result[2], result[3])
-//       res.send(final_result)
-//     } else {
-//       console.log(err);
-//       res.status(500).send(err);
-//     }
-//   })  
-// })
+       result.sort((a, b) => {
+         return b.followers - a.followers;
+       });
+       final_result = []
+       final_result.push(result[0], result[1], result[2], result[3])
+       res.send(final_result)
+     } else {
+       log(err, { in: '../routes/influencers/get/v0/influencers/popular'});
+       res.status(500).send(err);
+     }
+   })  
+ })
 
-// router.get('/', async (req, res, next) => {
-//   try {
-//     //let influencers_ref = db.ref('/influencers')
-//     //let snapshot = await influencers_ref.orderByChild('engagement').limitToLast(100).once('value');
+ router.get('/', async (req, res, next) => {
+   try {
+     //let influencers_ref = db.ref('/influencers')
+     //let snapshot = await influencers_ref.orderByChild('engagement').limitToLast(100).once('value');
 
-//     //let influencers = [];
-//     //snapshot.forEach(item => {
-//     //  let each = item.val()
-//     //  each.id = item.key
-//     //  each.relevance = calculate_relevance()
-//     //  influencers.push(each);
-//     //});
-//     //influencers.reverse()
-//     filePath = path.join(__dirname, '../config/data.json')
-//     fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-//       if (!err) {
-//         influencerdata = JSON.parse(data);
-//         influencers = influencerdata.influencers;
-//         let result = []
-//         for (i in influencers) {
-//           influencers[i].relevance = 100
-//           influencers[i].id = i
-//           result.push(influencers[i])
-//         }
-//         result.sort((a, b) => {
-//           return b.engagement - a.engagement
-//         });
-//         res.send(result)
-//       } else {
-//         console.log(err);
-//         res.status(500).send(err);
-//       }
-//     })
-//   }
-//   catch (error) {
-//     console.log(error)
-//     res.status(500).send(error);
-//   }
-// });
+     //let influencers = [];
+     //snapshot.forEach(item => {
+     //  let each = item.val()
+     //  each.id = item.key
+     //  each.relevance = calculate_relevance()
+     //  influencers.push(each);
+     //});
+     //influencers.reverse()
+     filePath = path.join(__dirname, '../config/data.json')
+     fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
+       if (!err) {
+         influencerdata = JSON.parse(data);
+         influencers = influencerdata.influencers;
+         let result = []
+         for (i in influencers) {
+           influencers[i].relevance = 100
+           influencers[i].id = i
+           result.push(influencers[i])
+         }
+         result.sort((a, b) => {
+           return b.engagement - a.engagement
+         });
+         res.send(result)
+       } else {
+         log(err, {in: '../routes/get/v0/influencers',  msg: 'trouble reading file'});
+         res.status(500).send(err);
+       }
+     })
+   }
+   catch (error) {
+     log.error(error, { in: '../routes/get/v0/influencers'})
+     res.status(500).send(error);
+   }
+ });
 
 
 // function calculate_relevance() {
