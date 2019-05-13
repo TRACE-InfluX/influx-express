@@ -26,10 +26,14 @@ module.exports = (async function(){
     
     var log = require('./notifications')
     log.success('Server Online')
-    
+    var weights = require('./database/weights').get('foo', 'bar')
+    log.info(weights)
+    //var counts = require('./database/counts')
+    //var result_counts = await counts.increment(['yeet', 'dab'])
+    //log.info(result_counts)
     return app
   }
-  catch(error) {
+  catch (error) {
     log.error(error, { in: '../app.js' })
   }
 })()

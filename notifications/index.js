@@ -16,8 +16,7 @@ let send = (level, msg) => {
     size: 2
   }
 
-  msg = typeof msg === 'error' ? msg.message:
-        typeof msg === 'object' ? '```JSON\n' + format(msg, options) + '```':
+  msg = typeof msg === 'object' ? '```JSON\n' + format(msg, options) + '```':
         msg.toString()
 
   let data = {
@@ -35,12 +34,14 @@ let send = (level, msg) => {
 module.exports = {
   send,
   error: (error, next) => {
+
     if (next) {
       if (error.trace) {
         error.trace.push(next)
         throw error
       }
-      else {
+      else {      
+        if (!Object.values(error).includes(error.message)) error.msg = error.message
         throw { error, trace: [next] }
       }
     }

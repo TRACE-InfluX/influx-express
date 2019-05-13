@@ -45,10 +45,10 @@ module.exports = {
       log.error(error, { in: '../database/weights.get/1' })
     }
   },
-  async add(keys) {
+  async add() {
 
   },
-  async subtract(keys) {
+  async subtract() {
 
   }
 }
