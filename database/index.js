@@ -14,7 +14,11 @@ module.exports = {
           })  
         }
       )
-      return client.db(database.name).collection(collection)
+      collection = client.db(database.name).collection(collection)
+      collection.close = () => {
+        client.close()
+      }
+      return collection
     }
     catch(error) {
       log.error(error, { in: '../database', msg: 'DB Connection Error' })

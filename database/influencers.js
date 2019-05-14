@@ -13,7 +13,7 @@ module.exports = {
         await counts.decrement(Object.keys(old_data[0].weights).concat('___global-influencers'))
       }
       let upsert_response = await collection.updateOne({ username: influencer.username }, { $set: influencer }, { upsert: true })
-     
+      collection.close()
       //adding to global_weights from influencer weights
       await global_weights.add(influencer.weights)
       
@@ -46,18 +46,22 @@ module.exports = {
       //adding influencer to activity collection
       let activity_collection = await db.open('influencers-by-activity')
       await activity_collection.updateOne({ id }, { $set: { id, activity: influencer.activity } }, { upsert: true } )
+      activity_collection.close()
       //adding influencer to engagement collection
       let engagement_collection = await db.open('influencers-by-engagement')
       await engagement_collection.updateOne({ id }, { $set: { id, followers: influencer.followers } }, { upsert: true })
+      engagement_collection.close()
       //adding influencer to followers collection
       let followers_collection = await db.open('influencers-by-followers')
       await followers_collection.updateOne({ id }, { $set: { id, followers: influencer.followers } }, { upsert: true })
+      followers_collection.close()
 
       for (let key in new_weights) {
         var collection_name = 'influencers-by-key[' + key + ']'
         let new_collection = await db.open(collection_name)
         await new_collection.createIndex({ weight: -1 }).catch()
         await new_collection.updateOne({ id }, { $set: { id,weight: new_weights[key] } }, {upsert: true})
+        new_collection.close()
       }
 
       return id
@@ -68,26 +72,30 @@ module.exports = {
   async get_by_id(id) {
     try {
       let collection = await db.open('influencers')
-      let counts = await db.open('influencer-counts')
-      counts = await counts.find({ key: '___global-influencers' }, { count: 1, _id: 0 }).toArray()
-      count = counts[0].count
-
       let influencer = await collection.find({ _id: id }, {}).toArray()
+      collection.close()
+      let counts_collection = await db.open('influencer-counts')
+      counts = await counts_collection.find({ key: '___global-influencers' }, { count: 1, _id: 0 }).toArray()
+      counts_collection.close()
+      count = counts[0].count
 
       influencer = influencer[0]
 
-      let activity = await db.open('influencers-by-activity')
-      activity = await activity.find({ _id: { $lte: influencer._id } }).count()
+      let activity_collection = await db.open('influencers-by-activity')
+      activity = await activity_collection.find({ _id: { $lte: influencer._id } }).count()
+      activity_collection.close()
       activity = 100 * (count - activity) / count
       influencer.activity = activity
 
-      let engagement = await db.open('influencers-by-engagmement')
-      engagement = await engagement.find({ _id: { $lte: influencer._id } }).count()
+      let engagement_collection = await db.open('influencers-by-engagmement')
+      engagement = await engagement_collection.find({ _id: { $lte: influencer._id } }).count()
+      engagement_collection.close()
       engagement = 100 * (count - engagement) / count
       influencer.engagement = engagement
 
-      let reach = await db.open('influencers-by-followers')
-      reach = await reach.find({ _id: { $lte: influencer._id } }).count()
+      let reach_collection = await db.open('influencers-by-followers')
+      reach = await reach_collection.find({ _id: { $lte: influencer._id } }).count()
+      reach_collection.close()
       reach = 100 * (count - reach) / count
       influencer.reach = reach
       
