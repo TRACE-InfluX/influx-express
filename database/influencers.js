@@ -42,8 +42,6 @@ module.exports = {
       }
       //geting insertedId from insert result callback
       let id = upsert_response.upsertedId._id || old_data[0]._id
-
-      log.info(id)
       //adding influencer to activity collection
       let activity_collection = db.open('influencers-by-activity')
       await activity_collection.updateOne({ id }, { $set: { id, activity: influencer.activity } }, { upsert: true } )
