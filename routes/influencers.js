@@ -1,6 +1,6 @@
 var express = require('express')
 var router = express.Router()
-var db = require('../database')
+var db = require('../database/influencers')
 var authorize = require('../auth/token')
 var validate = require('../validation')
 var influencer = require('../models/influencer')
@@ -74,8 +74,7 @@ var path = require('path')
      })
    }
    catch (error) {
-     log.error(error, { in: '../routes/get/v0/influencers'})
-     res.status(500).send(error);
+     res.status(500).send(error)
    }
  });
 
@@ -89,29 +88,12 @@ router.post('/',
   authorize('admin'),
   validate(influencer),
   async (req, res) => {
-
-    return res.send(req.user)
-
-    result = await checkuserexists(req.body.username)
-    if (!result) {
-      try {
-        let fbref = await db.ref('/influencers').push(req.body)
-        let snapshot = await fbref.once('value')
-        let created_influencer = snapshot.val()
-        created_influencer.id = fbref.key
-        return res.status(202).json(created_influencer)
-      }
-      catch (error) {
-        res.status(500).send(error)
-      }
-    } else {
-      try {
-        let userref = '/influencers/' + result.uid;
-        await db.ref(userref).update(req.body)
-        res.status(202).send({ message: "updated user: " + req.body.name })
-      } catch (error) {
-        res.status(500).send(error)
-      }
+    try {
+      let id = await db.add(req.body)
+      let response = await db.get_by_id(id)
+      res.send(response)
+    } catch (error) {
+      res.status(500).send(error)
     }
   }
 )

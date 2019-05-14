@@ -41,13 +41,41 @@ module.exports = {
       return result
     }
     catch (error) {
-      log.error(error, { in: '../database/weights.get/1' })
+      log.error(error, { in: '../database/weights.get/...' })
     }
   },
-  async add() {
 
+  async add(keys) {
+    try {
+      let ref = await db.open('weights')
+
+      let transactions = Object.keys(keys).map(key => {
+        return { updateOne: { filter: { key }, update: { $inc: { count: keys[key] } }, upsert: true } }
+      })
+
+      let res = await ref.bulkWrite(transactions)
+
+      return res
+    }
+    catch (error) {
+      log.error(error, { in: '../database/weights.add/1' })
+    }
   },
-  async subtract() {
 
+  async subtract(keys) {
+    try {
+      let ref = await db.open('weights')
+
+      let transactions = Object.keys(keys).map(key => {
+        return { updateOne: { filter: { key }, update: { $inc: { count: -keys[key] } } } }
+      })
+
+      let res = await ref.bulkWrite(transactions)
+
+      return res
+    }
+    catch (error) {
+      log.error(error, { in: '../database/weights.subtract/1' })
+    }
   }
 }

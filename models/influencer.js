@@ -12,6 +12,10 @@ module.exports = {
     "activity": Number(),
     "engagement": Number(),
     "valuation": Number(),
-    "weights": String()
+    "weights": Object(),
+    "preview": Array(),
+    "reach": Number(),
+    "conversion": Number(),
+    "cost": Number()
   }
 }
