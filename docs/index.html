@@ -6,7 +6,6 @@
     <title>Documentation</title>
     <meta name="description" content="The HTML5 Herald">
     <style>
-
         table, th, td {
             color: #575757;
             border: 1px solid black;
@@ -18,7 +17,7 @@
 </head>
 <body>
     <H1>Influx Documentation</H1>
-    <H2>DB structure</H2>
+    <H2>General influencer structure</H2>
     <table>
         <tr>
             <th><h3>Field</h3></th>
@@ -26,8 +25,8 @@
             <th><h3>Description</h3></th>
         </tr>
         <tr>
-            <th>id</th>
-            <th>Number</th>
+            <th>_id</th>
+            <th>String</th>
             <th>Generated ID for influencer</th>
         </tr>
         <tr>
@@ -61,7 +60,7 @@
             <th>Number of instagram users that they follow</th>
         </tr>
         <tr>
-            <th>num_posts</th>
+            <th>posts</th>
             <th>Number</th>
             <th>Number of posts the user has made</th>
         </tr>
@@ -96,14 +95,14 @@
             <th>Conversion score of a particular influencer</th>
         </tr>
         <tr>
-            <th>Cost</th>
+            <th>cost</th>
             <th>Number</th>
             <th>Estimated cost of a particular influencer</th>
         </tr>
         <tr>
-            <th>posts</th>
+            <th>preview</th>
             <th>Array of Strings</th>
-            <th>Array containing most recent post ids of an influencer (12 or less)</th>
+            <th>Array containing up to 12 of the most recent posts' media thumbnails</th>
         </tr>
     </table>
     <h2>
@@ -113,26 +112,30 @@
     <code>
     [
         {
-        "id": String,
+        "_id": String,
         "name": String,
         "username": String,
         "url": String,
         "profile_image": String,
+        "description": String,
+        "location": String,
         "followers": Number,
         "following": Number,
-        "num_posts": Number,
+        "posts": Number,
         "activity": Number,
         "relevance": Number,
         "engagement": Number,
-        "location": String,
+        "weights": {
+            Key: Number
+        }
+        "preview": [
+            String
+            ]
+        }
         "reach": Number,
         "conversion": Number,
         "cost": Number,
-        "description": String,
-        "posts": [
-            "postid": String
-            ]
-        }
+
     ]
     </code>
 </pre>
@@ -189,7 +192,7 @@
     <code>
 {
     "id": "something", //randomly generated ID?
-    "Email": "yeet@yeet.com",
+    "Email": "username@example.com",
     "Password": "ihuad98U29*D",
     "Admin" : "true"
 }
@@ -206,72 +209,6 @@
 
     <br>Return successful or failed account creation</br>
 
-    <h3>DB structure for reference</h3>
-    <pre>
-<code>
-    DB: {
-        influencer_count: Number,
-        influencers_by_engagement: [{
-                "influencer_id": String,
-                "raw_engagement": Number
-            }
-        ],
-        "influencers_by_activity": [{
-                "influencer_id": String,
-                "raw_activity": Number
-            }
-        ],
-        "influencers_by_followers": [{
-                "influencer_id": String,
-                "followers": Number
-            }
-        ],
-        "weights_index": {
-            "key_word": [
-            "influencer_id": String
-            ],
-        },
-        "global_weights": {
-            "key_word": Number
-        },
-        "accounts": {
-            "account_id": String,
-            "profiles:" [
-                "profile_id": String
-            ],
-            "username": String,
-            "e-mail": String,
-            "first_name": String,
-            "last_name": String
-        },
-        profiles: {
-            "profile_id": String,
-            "influencers_by_relevance": [
-                "influencer_id": String
-            ]
-        },
-        "influencers": [{
-                "influencer_id": String,
-                "username": String,
-                "url": String,
-                "raw_engagement": Number,
-                "raw_activity": Number,
-                "num_posts": Number,
-                "followers": Number,
-                "following": Number,
-                "profile_image": String,
-                "name": String
-                "raw_reach": Number,
-                "raw_cost": Number,
-                "raw_conversion": Number,
-                "posts": [
-                    "post_id": String
-                ]
-            }
-        ]
-    }
-</code>
-</pre>
 </body>
 
 </html>
