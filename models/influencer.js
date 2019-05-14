@@ -11,7 +11,9 @@ module.exports = {
     "posts": Number(),
     "activity": Number(),
     "engagement": Number(),
-    "valuation": Number(),
-    "weights": String()
+    "weights": Object(),
+    "preview": Array(),
+    "conversion": Number(),
+    "cost": Number()
   }
 }

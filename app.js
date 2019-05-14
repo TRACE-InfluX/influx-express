@@ -1,4 +1,4 @@
-module.exports = (async function(){
+﻿module.exports = (async function(){
   try {
     var express = require('express')
     var path = require('path')
@@ -29,7 +29,7 @@ module.exports = (async function(){
     
     return app
   }
-  catch(error) {
+  catch (error) {
     log.error(error, { in: '../app.js' })
   }
 })()
