@@ -29,10 +29,9 @@ module.exports = {
         $or: keys.map(k => { return { key : k } })
       }
 
-      const weights = await db.open('weights')
+      const weights = db.open('weights')
       const projection = { key:1, count:1, _id:0 }
       const data = await weights.find(query, { projection }).toArray()
-      weights.close()
       let result = {}
       for (let weight of data) {
         result[weight.key] = weight.count
@@ -47,14 +46,13 @@ module.exports = {
 
   async add(keys) {
     try {
-      let ref = await db.open('weights')
+      let ref = db.open('weights')
 
       let transactions = Object.keys(keys).map(key => {
         return { updateOne: { filter: { key }, update: { $inc: { count: keys[key] } }, upsert: true } }
       })
 
       let res = await ref.bulkWrite(transactions)
-      ref.close()
 
       return res
     }
@@ -65,14 +63,13 @@ module.exports = {
 
   async subtract(keys) {
     try {
-      let ref = await db.open('weights')
+      let ref = db.open('weights')
 
       let transactions = Object.keys(keys).map(key => {
         return { updateOne: { filter: { key }, update: { $inc: { count: -keys[key] } } } }
       })
 
       let res = await ref.bulkWrite(transactions)
-      ref.close()
 
       return res
     }
