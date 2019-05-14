@@ -5,7 +5,7 @@ var counts = require('../database/counts')
 module.exports = {
   async add(influencer) {
     try {
-      let collection = await db.open('influencers')
+      let collection = db.open('influencers')
       //adding influencer to table
       let old_data = await collection.find({ username: influencer.username }).toArray()
       if (old_data.length) {
@@ -41,25 +41,23 @@ module.exports = {
         }
       }
       //geting insertedId from insert result callback
-      let id = upsert_response.upsertedId || old_data[0]._id
+      let id = upsert_response.upsertedId._id || old_data[0]._id
       //adding influencer to activity collection
-      let activity_collection = await db.open('influencers-by-activity')
+      let activity_collection = db.open('influencers-by-activity')
       await activity_collection.updateOne({ id }, { $set: { id, activity: influencer.activity } }, { upsert: true } )
       //adding influencer to engagement collection
-      let engagement_collection = await db.open('influencers-by-engagement')
+      let engagement_collection = db.open('influencers-by-engagement')
       await engagement_collection.updateOne({ id }, { $set: { id, followers: influencer.followers } }, { upsert: true })
       //adding influencer to followers collection
-      let followers_collection = await db.open('influencers-by-followers')
+      let followers_collection = db.open('influencers-by-followers')
       await followers_collection.updateOne({ id }, { $set: { id, followers: influencer.followers } }, { upsert: true })
 
       for (let key in new_weights) {
         var collection_name = 'influencers-by-key[' + key + ']'
-        let new_collection = await db.open(collection_name)
+        let new_collection = db.open(collection_name)
         await new_collection.createIndex({ weight: -1 }).catch()
         await new_collection.updateOne({ id }, { $set: { id,weight: new_weights[key] } }, {upsert: true})
       }
-
-      collection.close()
       return id
     } catch (error) {
       log.error(error, {in: '/database/influencers.add/1'})
@@ -67,30 +65,29 @@ module.exports = {
   },
   async get_by_id(id) {
     try {
-      let collection = await db.open('influencers')
+      let collection = db.open('influencers')
       let influencer = await collection.find({ _id: id }, {}).toArray()
-      let counts_collection = await db.open('influencer-counts')
+      let counts_collection = db.open('influencer-counts')
       counts = await counts_collection.find({ key: '___global-influencers' }, { count: 1, _id: 0 }).toArray()
       count = counts[0].count
 
       influencer = influencer[0]
 
-      let activity_collection = await db.open('influencers-by-activity')
+      let activity_collection = db.open('influencers-by-activity')
       activity = await activity_collection.find({ _id: { $lte: influencer._id } }).count()
       activity = 100 * (count - activity) / count
       influencer.activity = activity
 
-      let engagement_collection = await db.open('influencers-by-engagmement')
+      let engagement_collection = db.open('influencers-by-engagmement')
       engagement = await engagement_collection.find({ _id: { $lte: influencer._id } }).count()
       engagement = 100 * (count - engagement) / count
       influencer.engagement = engagement
 
-      let reach_collection = await db.open('influencers-by-followers')
+      let reach_collection = db.open('influencers-by-followers')
       reach = await reach_collection.find({ _id: { $lte: influencer._id } }).count()
       reach = 100 * (count - reach) / count
       influencer.reach = reach
       
-      collection.close()
       return influencer
     } catch (error) {
       log.error(error, {in: '/database/influencers.get_by_id/1'})
