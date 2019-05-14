@@ -35,7 +35,7 @@ module.exports = {
       for (let entry of data) {
         result[entry.key] = entry.count
       }
-
+      count.close()
       return result
     }
     catch (error) {
@@ -74,6 +74,8 @@ module.exports = {
 
       let res = await ref.bulkWrite(transactions)
 
+      ref.close()
+
       return res
     }
     catch (error) {
@@ -111,6 +113,7 @@ module.exports = {
       })
 
       let res = await ref.bulkWrite(transactions)
+      ref.close()
 
       return res
     }

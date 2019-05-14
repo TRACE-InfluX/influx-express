@@ -32,7 +32,7 @@ module.exports = {
       const weights = await db.open('weights')
       const projection = { key:1, count:1, _id:0 }
       const data = await weights.find(query, { projection }).toArray()
-
+      weights.close()
       let result = {}
       for (let weight of data) {
         result[weight.key] = weight.count
@@ -54,6 +54,7 @@ module.exports = {
       })
 
       let res = await ref.bulkWrite(transactions)
+      ref.close()
 
       return res
     }
@@ -71,6 +72,7 @@ module.exports = {
       })
 
       let res = await ref.bulkWrite(transactions)
+      ref.close()
 
       return res
     }
