@@ -72,13 +72,12 @@ module.exports = {
       counts = await counts.find({ key: '___global-influencers' }, { count: 1, _id: 0 }).toArray()
       count = counts[0].count
 
-      log.info(id)
       let influencer = await collection.find({ _id: id }, {}).toArray()
-      log.info(influencer)
+
       influencer = influencer[0]
-      
+
       let activity = await db.open('influencers-by-activity')
-      activity = await activity.find({ _id: { $lte: influencer._id }}).count()
+      activity = await activity.find({ _id: { $lte: influencer._id } }).count()
       activity = 100 * (count - activity) / count
       influencer.activity = activity
 
@@ -86,6 +85,11 @@ module.exports = {
       engagement = await engagement.find({ _id: { $lte: influencer._id } }).count()
       engagement = 100 * (count - engagement) / count
       influencer.engagement = engagement
+
+      let reach = await db.open('influencers-by-followers')
+      reach = await reach.find({ _id: { $lte: influencer._id } }).count()
+      reach = 100 * (count - reach) / count
+      influencer.reach = reach
       
       return influencer
     } catch (error) {
