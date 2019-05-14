@@ -68,23 +68,23 @@ module.exports = {
       let collection = db.open('influencers')
       let influencer = await collection.find({ _id: id }, {}).toArray()
       let counts_collection = db.open('influencer-counts')
-      counts = await counts_collection.find({ key: '___global-influencers' }, { count: 1, _id: 0 }).toArray()
-      count = counts[0].count
+      let count = await counts_collection.find({ key: '___global-influencers' }, { count: 1, _id: 0 }).toArray()
+      count = count[0].count
 
       influencer = influencer[0]
 
       let activity_collection = db.open('influencers-by-activity')
-      activity = await activity_collection.find({ _id: { $lte: influencer._id } }).count()
+      let activity = await activity_collection.find({ _id: { $lte: influencer._id } }).count()
       activity = 100 * (count - activity) / count
       influencer.activity = activity
 
       let engagement_collection = db.open('influencers-by-engagmement')
-      engagement = await engagement_collection.find({ _id: { $lte: influencer._id } }).count()
+      let engagement = await engagement_collection.find({ _id: { $lte: influencer._id } }).count()
       engagement = 100 * (count - engagement) / count
       influencer.engagement = engagement
 
       let reach_collection = db.open('influencers-by-followers')
-      reach = await reach_collection.find({ _id: { $lte: influencer._id } }).count()
+      let reach = await reach_collection.find({ _id: { $lte: influencer._id } }).count()
       reach = 100 * (count - reach) / count
       influencer.reach = reach
       
