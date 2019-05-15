@@ -93,6 +93,9 @@ router.post('/',
       let response = await db.get_by_id(id)
       res.send(response)
     } catch (error) {
+      error.endpoint = 'POST /v0/influencers'
+      error.request  = req.body
+      log.warning(error)
       res.status(500).send(error)
     }
   }
