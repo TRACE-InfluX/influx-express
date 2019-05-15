@@ -51,19 +51,27 @@ module.exports = {
         }
       }
       
-      let id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data[0]._id
+      let _id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data[0]._id
       
       let transactions = []
 
       for (let key in new_weights) {
+        let path = `${key}._id`
+        let filter = {}
+        filter[path] = _id
+        let update = { $set: { 'influencers-by-relevance.$': { _id, weights: new_weights[key] } } }
+        transactions.push({ updateOne: { filter, update } })
+      }
+
+      for (let key in new_weights) {
         let filter = { key }
-        let update = { $push: { 'influencers-by-relevance': { id, weights: new_weights[key] } } }
-        transactions.push({ updateOne: { filter, update, upsert: true } })
+        let update = { $addToSet: { 'influencers-by-relevance': { _id, weights: new_weights[key] } } }
+        transactions.push({ updateOne: { filter, update } })
       }
 
       await db.open('weights').bulkWrite(transactions)
 
-      return id
+      return _id
 
     } catch (error) {
       log.error(error, {in: '/database/influencers.add/1'})
