@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+(async () => {
+  let db = require('../database');
+  try {
+    setTimeout(async() => {
+      let weights     = db.open('weights');
+      let influencers = db.open('influencers');
+      
+      await Promise.all([
+        weights.drop(), 
+        influencers.drop() 
+      ]);
+      
+      await Promise.all([
+        weights.createIndex({ "influencers-by-relevance.weight" : -1}),
+        influencers.createIndex({ activity : -1 }),
+        influencers.createIndex({ engagement : -1 }),
+        influencers.createIndex({ followers : -1 }),
+      ]);  
+
+      process.exit()
+    }, 500);
+  }
+  catch (error) {
+    console.error(error);
+  }
+
+})().catch(console.error);

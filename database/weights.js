@@ -53,6 +53,7 @@ module.exports = {
       })
 
       let res = await ref.bulkWrite(transactions)
+      await ref.updateMany({ "influencers-by-relevance": null}, { $set: { "influencers-by-relevance": []}})
 
       return res
     }
@@ -75,6 +76,49 @@ module.exports = {
     }
     catch (error) {
       log.error(error, { in: '../database/weights.subtract/1' })
+    }
+  },
+
+  async get_size() {
+    try {
+      let args = Array.prototype.slice.call(arguments)
+      let keys = []
+      if (typeof args[0] == 'string') {
+        for (let key of args) {
+          if (typeof key != 'string') {
+            throw 'Expected all arguments to be type: String'
+          }
+          keys.push(key)
+        }
+      }
+      else if (Array.isArray(args[0])) {
+        for (let key of args[0]) {
+          if (typeof key != 'string') {
+            throw 'Expected all arguments to be type: String'
+          }
+          keys.push(key)
+        }
+      }
+      else if (args[0]) {
+        keys = Object.keys(args[0])
+      }
+
+      let query = {
+        $or: keys.map(k => { return { key : k } })
+      }
+
+      const weights = db.open('weights')
+      const projection = { key: 1, _id: 0, 'influencers-by-relevance': 1}
+      const data = await weights.find(query, { projection }).toArray()
+      let result = {}
+      for (let weight of data) {
+        result[weight.key] = weight['influencers-by-relevance'].length
+      }
+
+      return result
+    }
+    catch (error) {
+      log.error(error, { in: '../database/weights.get_size/...' })
     }
   }
 }
