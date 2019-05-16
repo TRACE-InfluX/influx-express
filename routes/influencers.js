@@ -14,33 +14,42 @@ var path = require('path')
   
      //let influencers_ref = db.ref('/influencers')
      //let snapshot = await influencers_ref.orderByChild('followers').limitToLast(4).once('value');
-   filePath = path.join(__dirname, '../config/data.json')
-   fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-     if (!err) {
-       influencerdata = JSON.parse(data);
-       influencers = influencerdata.influencers;
-       let result = []
-       for (i in influencers) {
-         influencers[i].relevance = 100
-         influencers[i].id = i
-         result.push(influencers[i])
-       }
+   //filePath = path.join(__dirname, '../config/data.json')
+   //fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
+   //  if (!err) {
+   //    influencerdata = JSON.parse(data);
+   //    influencers = influencerdata.influencers;
+   //    let result = []
+   //    for (i in influencers) {
+   //      influencers[i].relevance = 100
+   //      influencers[i].id = i
+   //      result.push(influencers[i])
+   //    }
 
-       result.sort((a, b) => {
-         return b.followers - a.followers;
-       });
-       final_result = []
-       final_result.push(result[0], result[1], result[2], result[3])
-       res.send(final_result)
-     } else {
-       log(err, { in: '../routes/influencers/get/v0/influencers/popular'});
-       res.status(500).send(err);
-     }
-   })  
+   //    result.sort((a, b) => {
+   //      return b.followers - a.followers;
+   //    });
+   //    final_result = []
+   //    final_result.push(result[0], result[1], result[2], result[3])
+   //    res.send(final_result)
+   //  } else {
+   //    log(err, { in: '../routes/influencers/get/v0/influencers/popular'});
+   //    res.status(500).send(err);
+   //  }
+   //})  
+   try {
+     let top_four = await db.get_popular()
+     res.send(top_four)
+   } catch (error) {
+     error.endpoint = 'GET /v0/influencers/popular'
+     error.request = req.body
+     log.warning(error)
+     res.status(500).send(error)
+   }
  })
 
  router.get('/', async (req, res, next) => {
-   try {
+   
      //let influencers_ref = db.ref('/influencers')
      //let snapshot = await influencers_ref.orderByChild('engagement').limitToLast(100).once('value');
 
@@ -52,30 +61,42 @@ var path = require('path')
      //  influencers.push(each);
      //});
      //influencers.reverse()
-     filePath = path.join(__dirname, '../config/data.json')
-     fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-       if (!err) {
-         influencerdata = JSON.parse(data);
-         influencers = influencerdata.influencers;
-         let result = []
-         for (i in influencers) {
-           influencers[i].relevance = 100
-           influencers[i].id = i
-           result.push(influencers[i])
-         }
-         result.sort((a, b) => {
-           return b.engagement - a.engagement
-         });
-         res.send(result)
-       } else {
-         log(err, {in: '../routes/get/v0/influencers',  msg: 'trouble reading file'});
-         res.status(500).send(err);
-       }
-     })
-   }
-   catch (error) {
-     res.status(500).send(error)
-   }
+     //filePath = path.join(__dirname, '../config/data.json')
+     //fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
+     //  if (!err) {
+     //    influencerdata = JSON.parse(data);
+     //    influencers = influencerdata.influencers;
+     //    let result = []
+     //    for (i in influencers) {
+     //      influencers[i].relevance = 100
+     //      influencers[i].id = i
+     //      result.push(influencers[i])
+     //    }
+     //    result.sort((a, b) => {
+     //      return b.engagement - a.engagement
+     //    });
+     //    res.send(result)
+     //  } else {
+     //    log(err, {in: '../routes/get/v0/influencers',  msg: 'trouble reading file'});
+     //    res.status(500).send(err);
+     //  }
+     //})
+
+    try {
+      if (!req.body.page) {
+        req.body.page = 0
+      }
+      if (!req.body.filter) {
+        req.body.filter = 'engagement'
+      }
+      let influencers = await db.get_all(req.body.page, req.body.filter)
+      res.send(influencers)
+    } catch (error) {
+      error.endpoint = 'GET /v0/influencers'
+      error.request = req.body
+      log.warning(error)
+      res.status(500).send(error)
+    }
  });
 
 
