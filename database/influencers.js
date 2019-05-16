@@ -1,6 +1,7 @@
 var log = require('../notifications')
 var db = require('../database')
 var global_weights = require('../database/weights')
+// var performance = require('perf_hooks').performance
 
 let get_size = async function() {
   try {
@@ -19,21 +20,32 @@ module.exports = {
     try {
       let collection = db.open('influencers')
 
-      let [old_data, upsert_response, added_weights] = await Promise.all([
+      // let t0a = performance.now()
+      let [old_data, added_weights] = await Promise.all([
         collection.find({ username: influencer.username }).toArray(),
-        collection.updateOne({ username: influencer.username }, { $set: influencer }, { upsert: true }),
         global_weights.add(influencer.weights)
       ])
+      // let t1a = performance.now()
 
+      // log.info('Time to check exists, and add weights: ' + (t1a - t0a) + ' milliseconds')
+
+      // let t0b = performance.now()
       if (old_data.length) {
         await global_weights.subtract(old_data[0].weights)
       }
+      // let t1b = performance.now()
+      // log.info('Time to subtract weights: ' + (t1b - t0b) + ' milliseconds')
 
+
+      // let t0c = performance.now()
       let [matching_keys, size] = await Promise.all([
         global_weights.get(influencer.weights),
         get_size()
       ])
-
+      // let t1c = performance.now()
+      // log.info('Time to get size and matching weights: ' + (t1c - t0c) + ' milliseconds')
+      
+      // let t0d = performance.now()
       let avg_weights = {}
       for (let key in matching_keys) {
         avg_weights[key] = (matching_keys[key] - 1) / size
@@ -50,7 +62,16 @@ module.exports = {
           }
         }
       }
-      
+      // let t1d = performance.now()
+      // log.info('Time to process weights server side: ' + (t1d - t0d) + ' milliseconds')
+
+      influencer.processed_weights = new_weights
+
+      // let t0e = performance.now()
+      let upsert_response = await collection.updateOne({ username: influencer.username }, { $set: influencer }, { upsert: true })
+      // let t1e = performance.now()
+      // log.info('Time to upsert influencer: ' + (t1e - t0e) + ' milliseconds')
+
       let _id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data[0]._id
       
       let transactions = []
@@ -67,7 +88,10 @@ module.exports = {
         transactions.push({ updateOne: { filter, update } })
       }
 
+      // let t0f = performance.now()
       await db.open('weights').bulkWrite(transactions)
+      // let t1f = performance.now()
+      // log.info('Time to bulkwrite weights: ' + (t1f - t0f) + ' milliseconds')
 
       return _id
 
