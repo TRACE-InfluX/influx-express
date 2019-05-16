@@ -12,8 +12,9 @@
       ]);
       
       await Promise.all([
-        weights.createIndex({ "influencers-by-relevance.relevance" : -1}),
-        weights.createIndex({ "influencers-by-relevance._id" : 1}),
+        weights.createIndex({ 'influencers-by-relevance.relevance' : -1}),
+        weights.createIndex({ 'influencers-by-relevance._id' : 1}),
+        weights.createIndex({ key : 1}),
         influencers.createIndex({ activity : -1 }),
         influencers.createIndex({ engagement : -1 }),
         influencers.createIndex({ followers : -1 }),
