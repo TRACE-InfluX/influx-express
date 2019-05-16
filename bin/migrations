@@ -12,10 +12,13 @@
       ]);
       
       await Promise.all([
-        weights.createIndex({ "influencers-by-relevance.weight" : -1}),
+        weights.createIndex({ "influencers-by-relevance.relevance" : -1}),
+        weights.createIndex({ "influencers-by-relevance._id" : 1}),
         influencers.createIndex({ activity : -1 }),
         influencers.createIndex({ engagement : -1 }),
         influencers.createIndex({ followers : -1 }),
+        influencers.createIndex({ cost : 1 }),
+        influencers.createIndex({ profit : -1 })
       ]);  
 
       process.exit()

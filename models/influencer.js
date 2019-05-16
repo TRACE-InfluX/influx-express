@@ -13,7 +13,7 @@ module.exports = {
     "engagement": Number(),
     "weights": Object(),
     "preview": Array(),
-    "conversion": Number(),
+    "profit": Number(),
     "cost": Number()
   }
 }
