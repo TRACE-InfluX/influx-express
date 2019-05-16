@@ -89,7 +89,7 @@ module.exports = {
       }
 
       // let t0f = performance.now()
-      await db.open('weights').bulkWrite(transactions)
+      db.open('weights').bulkWrite(transactions)
       // let t1f = performance.now()
       // log.info('Time to bulkwrite weights: ' + (t1f - t0f) + ' milliseconds')
 

@@ -95,6 +95,8 @@ router.post('/',
     } catch (error) {
       error.endpoint = 'POST /v0/influencers'
       error.request  = req.body
+      error.request.weights = { keys: '...' }
+      error.request.preview = ['...']
       log.warning(error)
       res.status(500).send(error)
     }
