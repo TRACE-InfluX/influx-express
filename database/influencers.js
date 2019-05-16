@@ -15,6 +15,32 @@ let get_size = async function() {
 }
 
 module.exports = {
+  async get_all(page, filter) {
+    try {
+      if (page < 0) {
+        throw 'page size must be greater than or equal to 0'
+      }
+      let influencers = db.open('influencers')
+      let size = 100
+      let skip = size * (page)
+      let limit = size
+      let sort = {}
+      sort[filter] = -1
+      return await influencers.find({}, { projection: { weights: 0, processed_weights: 0 } }).skip(skip).limit(limit).sort(sort).toArray()
+    } catch (error) {
+      log.error(error, {in: '/database/influencers.get_all/1'})
+    }
+  }
+  ,
+  async get_popular() {
+    try {
+      let influencers = db.open('influencers')
+      let top_four = await influencers.find({}, { projection: { weights: 0, processed_weights: 0 } }).sort({followers: -1}).limit(4).toArray()
+      return top_four
+    } catch (error) {
+      log.error(error, {in: '/database/influencers.get_popular/0'})
+    }
+  },
   get_size,
   async add(influencer) {
     try {
