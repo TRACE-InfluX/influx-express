@@ -56,16 +56,14 @@ module.exports = {
       let transactions = []
 
       for (let key in new_weights) {
-        let path = `${key}._id`
-        let filter = {}
-        filter[path] = _id
-        let update = { $set: { 'influencers-by-relevance.$': { _id, weights: new_weights[key] } } }
-        transactions.push({ updateOne: { filter, update } })
+        let filter = { key }
+        let update = { $set: { 'influencers-by-relevance.$[influencer]': { _id, relevance: new_weights[key] } } }
+        transactions.push({ updateOne: { filter, update, arrayFilters: [{'influencer._id': _id }] } })
       }
 
       for (let key in new_weights) {
         let filter = { key }
-        let update = { $addToSet: { 'influencers-by-relevance': { _id, weights: new_weights[key] } } }
+        let update = { $addToSet: { 'influencers-by-relevance': { _id, relevance: new_weights[key] } } }
         transactions.push({ updateOne: { filter, update } })
       }
 
