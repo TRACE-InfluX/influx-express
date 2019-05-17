@@ -11,38 +11,11 @@ var fs = require('fs')
 var path = require('path')
 
  router.get('/popular', async (req, res, next) => {
-  
-     //let influencers_ref = db.ref('/influencers')
-     //let snapshot = await influencers_ref.orderByChild('followers').limitToLast(4).once('value');
-   //filePath = path.join(__dirname, '../config/data.json')
-   //fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-   //  if (!err) {
-   //    influencerdata = JSON.parse(data);
-   //    influencers = influencerdata.influencers;
-   //    let result = []
-   //    for (i in influencers) {
-   //      influencers[i].relevance = 100
-   //      influencers[i].id = i
-   //      result.push(influencers[i])
-   //    }
-
-   //    result.sort((a, b) => {
-   //      return b.followers - a.followers;
-   //    });
-   //    final_result = []
-   //    final_result.push(result[0], result[1], result[2], result[3])
-   //    res.send(final_result)
-   //  } else {
-   //    log(err, { in: '../routes/influencers/get/v0/influencers/popular'});
-   //    res.status(500).send(err);
-   //  }
-   //})  
    try {
      let top_four = await db.get_popular()
      res.send(top_four)
    } catch (error) {
      error.endpoint = 'GET /v0/influencers/popular'
-     error.request = req.body
      log.warning(error)
      res.status(500).send(error)
    }

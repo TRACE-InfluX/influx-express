@@ -48,7 +48,7 @@ module.exports = {
 
       // let t0a = performance.now()
       let [old_data, added_weights] = await Promise.all([
-        collection.find({ username: influencer.username }).toArray(),
+        collection.findOne({ username: influencer.username }),
         global_weights.add(influencer.weights)
       ])
       // let t1a = performance.now()
@@ -56,8 +56,8 @@ module.exports = {
       // log.info('Time to check exists, and add weights: ' + (t1a - t0a) + ' milliseconds')
 
       // let t0b = performance.now()
-      if (old_data.length) {
-        await global_weights.subtract(old_data[0].weights)
+      if (old_data) {
+        await global_weights.subtract(old_data.weights)
       }
       // let t1b = performance.now()
       // log.info('Time to subtract weights: ' + (t1b - t0b) + ' milliseconds')
@@ -98,7 +98,7 @@ module.exports = {
       // let t1e = performance.now()
       // log.info('Time to upsert influencer: ' + (t1e - t0e) + ' milliseconds')
 
-      let _id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data[0]._id
+      let _id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data._id
       
       let transactions = []
 
@@ -131,11 +131,9 @@ module.exports = {
       let collection = db.open('influencers')
 
       let [influencer, size] = await Promise.all([
-        collection.find({ _id: id }, {}).toArray(),
+        collection.findOne({ _id: id }, {}),
         get_size()
       ])
-
-      influencer = influencer[0]
 
       let [activity, engagement, reach] = await Promise.all([
         collection.find({ _id: { $lt: influencer._id } }, { hint: { activity: -1 } }).count(),
