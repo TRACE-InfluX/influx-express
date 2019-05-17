@@ -1,4 +1,5 @@
-﻿module.exports = (async function(){
+﻿var log = require('./notifications')
+module.exports = (async function () {
   try {
     var express = require('express')
     var path = require('path')
@@ -23,10 +24,7 @@
     app.use('/v0/accounts', accountsRouter)
     app.use('/v0/auth', auth)
     app.use('/v0/influencers', influencerrouter)
-    
-    var log = require('./notifications')
     log.success('Server Online')
-    
     return app
   }
   catch (error) {

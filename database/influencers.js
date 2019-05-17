@@ -1,6 +1,7 @@
 var log = require('../notifications')
 var db = require('../database')
 var global_weights = require('../database/weights')
+var ObjectId = require('mongodb').ObjectId
 // var performance = require('perf_hooks').performance
 
 let get_size = async function() {
@@ -15,7 +16,7 @@ let get_size = async function() {
 }
 
 module.exports = {
-  async get_all(page, filter) {
+  async get_all(data) {
     try {
       if (page < 0) {
         throw 'page size must be greater than or equal to 0'
@@ -26,12 +27,105 @@ module.exports = {
       let limit = size
       let sort = {}
       sort[filter] = -1
-      return await influencers.find({}, { projection: { weights: 0, processed_weights: 0 } }).skip(skip).limit(limit).sort(sort).toArray()
+      let sorted_influencers = await influencers.find({}, { projection: { weights: 0, processed_weights: 0 } }).skip(skip).limit(limit).sort(sort).toArray()
     } catch (error) {
       log.error(error, {in: '/database/influencers.get_all/1'})
     }
-  }
-  ,
+  },
+  async get_influencers_by() {
+    try {
+      let args = Array.prototype.slice.call(arguments)
+      let keys = []
+      if (typeof args[0] == 'string') {
+        for (let key of args) {
+          if (typeof key != 'string') {
+            throw 'Expected all arguments to be type: String'
+          }
+          keys.push(key)
+        }
+      }
+      else if (Array.isArray(args[0])) {
+        for (let key of args[0]) {
+          if (typeof key != 'string') {
+            throw 'Expected all arguments to be type: String'
+          }
+          keys.push(key)
+        }
+      }
+      else if (args[0]) {
+        keys = Object.keys(args[0])
+      }
+      let weights = db.open('weights')
+
+      let relevance = {}
+      let hash_keys = keys.map(key => '#' + key)
+      keys = keys.concat(hash_keys)
+
+      let query = {
+        $or: keys.map(k => { return { key: k } })
+      }
+
+
+      let [matched_weights, size] = await Promise.all([
+        weights.find(query, { hint: { 'influencers-by-relevance.relevance': -1 } }).toArray(),
+        get_size()
+      ])
+      for (let weight of matched_weights) {
+        for (let influencer of weight['influencers-by-relevance']) {
+          if (relevance[influencer._id]) {
+            relevance[influencer._id] += influencer.relevance
+          } else {
+            relevance[influencer._id] = influencer.relevance
+          }
+        }
+      }
+
+      query = {
+        $or: Object.keys(relevance).map(id => { return { _id: ObjectId(id) } })
+      }
+
+      let influencer_collection = db.open('influencers')
+      let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0, processed_weights: 0 }, hint: { _id: 1 } }).toArray()
+
+      let activity = {}
+      let engagement = {}
+      let reach = {}
+
+      let operations = []
+      for (let influencer of matched_influencers) {
+        let a = influencer_collection.find({ activity: { $lt: influencer.activity } }, { hint: { activity: -1 } }).count().then(i => { activity[influencer._id] = 100 * (size - i) / size })
+        let e = influencer_collection.find({ engagement: { $lt: influencer.engagement } }, { hint: { engagement: -1 } }).count().then(i => { engagement[influencer._id] = 100 * (size - i) / size })
+        let r = influencer_collection.find({ followers: { $lt: influencer.followers } }, { hint: { followers: -1 } }).count().then(i => { reach[influencer._id] = 100 * (size - i) / size })
+        operations.push(a)
+        operations.push(e)
+        operations.push(r)
+      }
+
+      await Promise.all(operations)
+
+      let result = matched_influencers.map(influencer => {
+        let _id = influencer._id
+        influencer.relevance = relevance[_id] + 50 // TODO: profile analysis
+        influencer.activity = activity[_id]
+        influencer.engagement = engagement[_id]
+        influencer.reach = reach[_id]
+        return influencer
+      }).sort((a, b) => {
+        return b.relevance - a.relevance
+      })
+
+
+
+
+      // TODO: cache
+
+      return result
+
+    } catch (err) {
+      log.error( err, { in: '/database/influencers.get_influencers_by/...' })
+    }
+
+  },
   async get_popular() {
     try {
       let influencers = db.open('influencers')
@@ -131,16 +225,15 @@ module.exports = {
       let collection = db.open('influencers')
 
       let [influencer, size] = await Promise.all([
-        collection.find({ _id: id }, {}).toArray(),
+        collection.findOne({ _id: id }, {}),
         get_size()
       ])
 
-      influencer = influencer[0]
-
+      
       let [activity, engagement, reach] = await Promise.all([
-        collection.find({ _id: { $lt: influencer._id } }, { hint: { activity: -1 } }).count(),
-        collection.find({ _id: { $lt: influencer._id } }, { hint: { engagement: -1 } }).count(),
-        collection.find({ _id: { $lt: influencer._id } }, { hint: { followers: -1 } }).count()
+        collection.find({ activity: { $lt: influencer.activity } }).sort({activity: -1}).count(),
+        collection.find({ engagement: { $lt: influencer.engagement } }).sort({ engagement: -1 }).count(),
+        collection.find({ followers: { $lt: influencer.followers } }).sort({ followers: -1 }).count()
       ])
 
       activity = 100 * (size - activity) / size
