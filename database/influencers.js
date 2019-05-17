@@ -93,9 +93,9 @@ module.exports = {
 
       let operations = []
       for (let influencer of matched_influencers) {
-        let a = influencer_collection.find({ activity: { $lt: influencer.activity } }, { hint: { activity: -1 } }).count().then(i => { activity[influencer._id] = 100 * (size - i) / size })
-        let e = influencer_collection.find({ engagement: { $lt: influencer.engagement } }, { hint: { engagement: -1 } }).count().then(i => { engagement[influencer._id] = 100 * (size - i) / size })
-        let r = influencer_collection.find({ followers: { $lt: influencer.followers } }, { hint: { followers: -1 } }).count().then(i => { reach[influencer._id] = 100 * (size - i) / size })
+        let a = influencer_collection.find({ activity: { $lt: influencer.activity } }, { hint: { activity: -1 } }).count().then(i => { activity[influencer._id] = 100 * i / size })
+        let e = influencer_collection.find({ engagement: { $lt: influencer.engagement } }, { hint: { engagement: -1 } }).count().then(i => { engagement[influencer._id] = 100 * i / size })
+        let r = influencer_collection.find({ followers: { $lt: influencer.followers } }, { hint: { followers: -1 } }).count().then(i => { reach[influencer._id] = 100 * i / size })
         operations.push(a)
         operations.push(e)
         operations.push(r)
@@ -110,12 +110,7 @@ module.exports = {
         influencer.engagement = engagement[_id]
         influencer.reach = reach[_id]
         return influencer
-      }).sort((a, b) => {
-        return b.relevance - a.relevance
       })
-
-
-
 
       // TODO: cache
 
