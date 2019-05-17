@@ -11,19 +11,17 @@ try {
   var fs = require('fs')
   var path = require('path')
 
-  router.get('/popular', async (req, res, next) => {
-    try {
-      let top_four = await db.get_popular()
-      res.send(top_four)
-    } catch (error) {
-      error.endpoint = 'GET /v0/influencers/popular'
-      error.request = req.body
-      log.warning(error)
-      res.status(500).send(error)
-    }
-  })
 
-  router.get('/', async (req, res, next) => {
+ router.get('/popular', async (req, res, next) => {
+   try {
+     let top_four = await db.get_popular()
+     res.send(top_four)
+   } catch (error) {
+     error.endpoint = 'GET /v0/influencers/popular'
+     log.warning(error)
+     res.status(500).send(error)
+   }
+ })
 
     //let influencers_ref = db.ref('/influencers')
     //let snapshot = await influencers_ref.orderByChild('engagement').limitToLast(100).once('value');
@@ -83,20 +81,23 @@ try {
   //   return 1
   // }
 
-  router.post('/',
-    authorize('admin'),
-    validate(influencer),
-    async (req, res) => {
-      try {
-        let id = await db.add(req.body)
-        let response = await db.get_by_id(id)
-        res.send(response)
-      } catch (error) {
-        error.endpoint = 'POST /v0/influencers'
-        error.request = req.body
-        log.warning(error)
-        res.status(500).send(error)
-      }
+
+router.post('/',
+  authorize('admin'),
+  validate(influencer),
+  async (req, res) => {
+    try {
+      let id = await db.add(req.body)
+      let response = await db.get_by_id(id)
+      res.send(response)
+    } catch (error) {
+      error.endpoint = 'POST /v0/influencers'
+      error.request  = req.body
+      error.request.weights = { keys: '...' }
+      error.request.preview = ['...']
+      log.warning(error)
+      res.status(500).send(error)
+
     }
   )
 
