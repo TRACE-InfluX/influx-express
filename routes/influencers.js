@@ -42,7 +42,7 @@ router.get('/',
 
           return Object.keys(weights).reduce(accumulator, 0)
         })
-        
+
         // cache.save(req.body, result)
         res.send(result)
       }
@@ -52,6 +52,7 @@ router.get('/',
 
     } catch (error) {
       console.log(error)
+      if(error == 404) return res.status(404).send({ error: 'No Results Found', query: req.body.query})
       error.endpoint = 'GET /v0/influencers'
       error.request = req.body
       log.warning(error)

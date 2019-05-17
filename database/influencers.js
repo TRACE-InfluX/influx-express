@@ -65,7 +65,6 @@ module.exports = {
         $or: keys.map(k => { return { key: k } })
       }
 
-
       let [matched_weights, size] = await Promise.all([
         weights.find(query, { hint: { 'influencers-by-relevance.relevance': -1 } }).toArray(),
         get_size()
@@ -84,6 +83,10 @@ module.exports = {
         $or: Object.keys(relevance).map(id => { return { _id: ObjectId(id) } })
       }
 
+      if(!query.$or.length) {
+        throw 404
+      }
+      
       let influencer_collection = db.open('influencers')
       let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0, processed_weights: 0 }, hint: { _id: 1 } }).toArray()
 
@@ -117,7 +120,10 @@ module.exports = {
       return result
 
     } catch (err) {
-      log.error( err, { in: '/database/influencers.get_influencers_by/...' })
+      if (err == 404) throw 404
+      else {
+        log.error( err, { in: '/database/influencers.get_influencers_by/...' })
+      }
     }
 
   },
