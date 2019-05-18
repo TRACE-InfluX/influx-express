@@ -3,7 +3,7 @@ try {
   var express = require('express')
   var router = express.Router()
   var db = require('../database/influencers')
-  // var cache = require('../database/cache')
+  var cache = require('../database/cache')
   var authorize = require('../auth/token')
   var validate = require('../validation')
   var influencer = require('../models/influencer')
@@ -43,7 +43,7 @@ router.get('/',
           return Object.keys(weights).reduce(accumulator, 0)
         })
 
-        // cache.save(req.body, result)
+        await cache.save(req.body, result)
         res.send(result)
       }
       else {
