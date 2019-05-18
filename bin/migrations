@@ -22,7 +22,8 @@
         influencers.createIndex({ followers : -1 }),
         influencers.createIndex({ cost : 1 }),
         influencers.createIndex({ profit : -1 }),
-		query_cache.createIndex({ query : 1 })
+		    query_cache.createIndex({ query : 1 }),
+        query_cache.createIndex({'caches.sorts': 1})
       ]);  
 
       process.exit()
