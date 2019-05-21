@@ -72,7 +72,7 @@ module.exports = {
       }
       
       let influencer_collection = db.open('influencers')
-      let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0}, hint: { _id: 1 } }).toArray()
+      let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0, processed_weights: 0}, hint: { _id: 1 } }).toArray()
       
       let activity = {}
       let engagement = {}

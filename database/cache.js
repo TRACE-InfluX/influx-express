@@ -73,7 +73,7 @@ module.exports = {
 
       let filter = { $or: Object.keys(cache.positions).map( id => { return { _id : ObjectId(id) } } ) }
 
-      let influencers = await db.open('influencers').find(filter, { projection: { weights: 0}}).toArray()
+      let influencers = await db.open('influencers').find(filter, { projection: { weights: 0, processed_weights: 0}}).toArray()
 
       let reweighted = influencers.map(influencer => {
         let _id = influencer._id

@@ -1,14 +1,14 @@
 module.exports = function({required, optional = {}}) {
 
   return (req, res, next) => {
-
-    if (req.headers['content-type'] !== 'application/json') {
+    
+    if (req.method != 'GET' && !req.headers['content-type'].includes('application/json')) {
       return res.status(400).send({ message: 'Expected Header - Content-Type: application/json' })
     }
   
     let errors = {}
     
-    let input = req.body
+    let input = req.method == 'GET' ? req.query : req.body
 
     // Check Required Fields
     for (let key of Object.keys(required)) {
