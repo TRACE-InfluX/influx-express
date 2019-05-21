@@ -26,8 +26,8 @@ router.get('/',
   async (req, res, next) => {
     try {
 
-      let cache_result // = cache.load(req.body)
-
+      let cache_result = await cache.load(req.body)
+      
       if(!cache_result){
 
         let keys = req.body.query.split(' ')
