@@ -16,22 +16,6 @@ let get_size = async function() {
 }
 
 module.exports = {
-  async get_all(data) {
-    try {
-      if (page < 0) {
-        throw 'page size must be greater than or equal to 0'
-      }
-      let influencers = db.open('influencers')
-      let size = 100
-      let skip = size * (page)
-      let limit = size
-      let sort = {}
-      sort[filter] = -1
-      let sorted_influencers = await influencers.find({}, { projection: { weights: 0, processed_weights: 0 } }).skip(skip).limit(limit).sort(sort).toArray()
-    } catch (error) {
-      log.error(error, {in: '/database/influencers.get_all/1'})
-    }
-  },
   async get_influencers_by() {
     try {
       let args = Array.prototype.slice.call(arguments)
@@ -88,34 +72,42 @@ module.exports = {
       }
       
       let influencer_collection = db.open('influencers')
-      let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0, processed_weights: 0 }, hint: { _id: 1 } }).toArray()
-
+      let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0}, hint: { _id: 1 } }).toArray()
+      
       let activity = {}
       let engagement = {}
       let reach = {}
-
+      let profit = {}
+      let cost = {}
+      
       let operations = []
       for (let influencer of matched_influencers) {
         let a = influencer_collection.find({ activity: { $lt: influencer.activity } }, { hint: { activity: -1 } }).count().then(i => { activity[influencer._id] = 100 * i / size })
         let e = influencer_collection.find({ engagement: { $lt: influencer.engagement } }, { hint: { engagement: -1 } }).count().then(i => { engagement[influencer._id] = 100 * i / size })
         let r = influencer_collection.find({ followers: { $lt: influencer.followers } }, { hint: { followers: -1 } }).count().then(i => { reach[influencer._id] = 100 * i / size })
+        let p = influencer_collection.find({ profit: { $lt: influencer.profit } }, { hint: { profit: -1 } }).count().then(i => { profit[influencer._id] = 100 * i / size })
+        let c = influencer_collection.find({ cost: { $lt: influencer.cost } }, { hint: { cost: 1 } }).count().then(i => { cost[influencer._id] = 100 * i / size })
         operations.push(a)
         operations.push(e)
         operations.push(r)
+        operations.push(p)
+        operations.push(c)
       }
 
       await Promise.all(operations)
 
       let result = matched_influencers.map(influencer => {
         let _id = influencer._id
+        influencer.cost_cad = Math.round(100 * influencer.cost) / 100
+        influencer.profit_cad = Math.round(100 * influencer.profit) / 100
         influencer.relevance = relevance[_id] + 50 // TODO: profile analysis
         influencer.activity = activity[_id]
         influencer.engagement = engagement[_id]
         influencer.reach = reach[_id]
+        influencer.cost = cost[_id]
+        influencer.profit = profit[_id]
         return influencer
       })
-
-      // TODO: cache
 
       return result
 
