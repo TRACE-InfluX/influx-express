@@ -25,9 +25,9 @@ router.get('/',
   validate(search),
   async (req, res, next) => {
     try {
-
-      let cache_result = await cache.load(req.body)
       
+      let cache_result = await cache.load(req.body)
+
       if(!cache_result){
 
         let keys = req.body.query.split(' ')
@@ -60,7 +60,6 @@ router.get('/',
     }
   }
 );
-
 router.post('/',
   authorize('admin'),
   validate(influencer),
@@ -76,7 +75,6 @@ router.post('/',
       error.request.preview = ['...']
       log.warning(error)
       res.status(500).send(error)
-
     }
   }
 )

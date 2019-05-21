@@ -2,6 +2,10 @@ var log = require('../notifications')
 var db  = require('../database')
 
 module.exports = {
+  async get_weights_by_id(id) {
+    
+  }
+  ,
   async get() {
     try {
       let args = Array.prototype.slice.call(arguments)
