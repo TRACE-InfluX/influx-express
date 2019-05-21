@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var auth = require('../auth')
+var authorize = require('../auth/token')
 var credentials = require('../models/credentials')
 var validate = require('../validation')
 
@@ -21,6 +22,13 @@ router.post('/',
       return res.status(401).send(error)
     }
 
+  }
+)
+
+router.get('/me', 
+  authorize('user'),
+  (req, res) => {
+    return res.send(req.user)
   }
 )
 
