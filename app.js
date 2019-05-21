@@ -10,7 +10,6 @@ module.exports = (async function () {
     var accountsRouter = require('./routes/accounts')
     var auth = require('./routes/auth')
     var influencerrouter = require('./routes/influencers')
-    
     var app = express()
     var passport = require('passport')
     app.use(passport.initialize())

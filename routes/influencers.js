@@ -25,14 +25,15 @@ router.get('/',
   validate(search),
   async (req, res, next) => {
     try {
-
-      let cache_result = await cache.load(req.body)
+      let query = req.query
+      query.sort_by = JSON.parse(query.sort_by)
+      let cache_result = await cache.load(query)
       
       if(!cache_result){
 
-        let keys = req.body.query.split(' ')
+        let keys = query.query.split(' ')
         let result = await db.get_influencers_by(keys)
-        let weights = req.body.sort_by
+        let weights = query.sort_by
 
         result.sort((a, b) => {
 
@@ -43,7 +44,7 @@ router.get('/',
           return Object.keys(weights).reduce(accumulator, 0)
         })
 
-        await cache.save(req.body, result)
+        await cache.save(query, result)
         res.send(result)
       }
       else {
@@ -54,7 +55,7 @@ router.get('/',
       console.log(error)
       if(error == 404) return res.status(404).send({ error: 'No Results Found', query: req.body.query})
       error.endpoint = 'GET /v0/influencers'
-      error.request = req.body
+      error.request = req.query
       log.warning(error)
       res.status(500).send(error)
     }

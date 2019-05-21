@@ -1,6 +1,6 @@
 module.exports = {
     required : {
       "query": String(),
-      "sort_by": Object()
+      "sort_by": String()
     }
   }
