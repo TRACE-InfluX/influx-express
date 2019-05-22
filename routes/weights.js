@@ -4,10 +4,9 @@ try {
   var router = express.Router()
   var db = require('../database/weights')
   var validate = require('../validation')
-  var influencer = require('../models/weight_params')
-  router.get('/',async (req, res, next) => {
+  var weight_params = require('../models/weight_params')
+  router.get('/', validate(weight_params) , async (req, res, next) => {
     try {
-      console.log(req.query)
       let processed_weights = await db.get_weights_by_id(req.query._id)
       res.send(processed_weights)
     } catch (error) {
