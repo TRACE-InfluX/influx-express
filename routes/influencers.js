@@ -31,7 +31,7 @@ router.get('/',
 
       if(!cache_result){
 
-        let keys = query.query.split(' ')
+        let keys = query.query.toLowerCase().split(' ')
         let result = await db.get_influencers_by(keys)
         let weights = query.sort_by
 
