@@ -41,7 +41,6 @@ module.exports = {
       }
       let weights = db.open('weights')
 
-      let relevance = {}
       let hash_keys = keys.map(key => '#' + key)
       keys = keys.concat(hash_keys)
 
@@ -53,15 +52,45 @@ module.exports = {
         weights.find(query, { hint: { 'influencers-by-relevance.relevance': -1 } }).toArray(),
         get_size()
       ])
+
+      let merged_pools = {}
+      let the_current_key
       for (let weight of matched_weights) {
+        the_current_key = weight.key
+        if (the_current_key[0] == '#') {
+          the_current_key = the_current_key.substr(1)
+        }
+        if (!merged_pools[the_current_key]) {
+          merged_pools[the_current_key] = {}
+        }
         for (let influencer of weight['influencers-by-relevance']) {
-          if (relevance[influencer._id]) {
-            relevance[influencer._id] += influencer.relevance
+          if (merged_pools[the_current_key][influencer._id]) {
+            merged_pools[the_current_key][influencer._id] += influencer.relevance
           } else {
-            relevance[influencer._id] = influencer.relevance
+            merged_pools[the_current_key][influencer._id] = influencer.relevance
           }
         }
       }
+
+      let enum_pool = []
+
+      for (let merge_key in merged_pools) {
+        if (merge_key != the_current_key) {
+          enum_pool.push(merged_pools[merge_key])
+        }
+      }
+
+      let accumulator = (pool, next) => {
+        let new_pool = {}
+        for(let id in pool) {
+          if (next[id]) {
+            new_pool[id] = pool[id] + next[id]
+          }
+        }
+        return new_pool
+      }
+
+      let relevance = enum_pool.reduce(accumulator, merged_pools[the_current_key])
 
       query = {
         $or: Object.keys(relevance).map(id => { return { _id: ObjectId(id) } })
@@ -100,7 +129,7 @@ module.exports = {
         let _id = influencer._id
         influencer.cost_cad = Math.round(100 * influencer.cost) / 100
         influencer.profit_cad = Math.round(100 * influencer.profit) / 100
-        influencer.relevance = relevance[_id] + 50 // TODO: profile analysis
+        influencer.relevance = 20 + 10 * Math.log2(2 + relevance[_id]) / keys.length
         influencer.activity = activity[_id]
         influencer.engagement = engagement[_id]
         influencer.reach = reach[_id]
