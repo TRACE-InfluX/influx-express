@@ -25,14 +25,9 @@ router.get('/',
   validate(search),
   async (req, res, next) => {
     try {
-<<<<<<< HEAD
-=======
       let query = req.query
       query.sort_by = JSON.parse(query.sort_by)
       let cache_result = await cache.load(query)
->>>>>>> e829557e9c94593a81588f172c6a75ea36456acf
-      
-      let cache_result = await cache.load(req.body)
 
       if(!cache_result){
 

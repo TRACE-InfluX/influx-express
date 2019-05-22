@@ -1,9 +1,17 @@
 var log = require('../notifications')
 var db  = require('../database')
+var ObjectId = require('mongodb').ObjectId
 
 module.exports = {
-  async get_weights_by_id(id) {
-    
+  async get_weights_by_id(_id) {
+    try {
+      let influencers = await db.open('influencers')
+      let projections = {processed_weights: 1}
+      let processed_weights = await influencers.findOne({_id: ObjectId(_id) }, {projection: projections})
+      return processed_weights
+    } catch(error) {
+      log.error(error, {in: '/database/weights.get_weights_by_id/1'})
+    }
   }
   ,
   async get() {

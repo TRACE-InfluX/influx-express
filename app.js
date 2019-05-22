@@ -10,6 +10,8 @@ module.exports = (async function () {
     var accountsRouter = require('./routes/accounts')
     var auth = require('./routes/auth')
     var influencerrouter = require('./routes/influencers')
+    var weightsrouter = require('./routes/weights')
+
     var app = express()
     var passport = require('passport')
     app.use(passport.initialize())
@@ -23,6 +25,7 @@ module.exports = (async function () {
     app.use('/v0/accounts', accountsRouter)
     app.use('/v0/auth', auth)
     app.use('/v0/influencers', influencerrouter)
+    app.use('/v0/weights', weightsrouter)
     log.success('Server Online')
     return app
   }
