@@ -8,7 +8,7 @@ try{
   async (req, res) => {
     try {
       let login  = await auth.signInWithEmailAndPassword(req.body.email, req.body.password).catch(error => {
-        res.status(401).send(error)
+        res.status(401).send(error) 
       })
       let token  = await login.user.getIdToken()
       res.send({ message: 'Logged in!', token})
@@ -19,7 +19,7 @@ try{
   }
 )
 
-module.exports = router
+  module.exports = router
 
 }catch(error) {
   console.log(error)

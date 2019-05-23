@@ -4,32 +4,36 @@ var auth = require('../auth')
 var authorize = require('../auth/token')
 var credentials = require('../models/credentials')
 var validate = require('../validation')
+try{
+  router.post('/',
+    validate(credentials),
+    async (req, res) => {
 
-router.post('/',
-  validate(credentials),
-  async (req, res) => {
+      let email    = req.body.email
+      let password = req.body.password
 
-    let email    = req.body.email
-    let password = req.body.password
-
-    try {
-      await auth.createUserWithEmailAndPassword(email, password)
-      let login = await auth.signInWithEmailAndPassword(email, password)
-      let token = await login.user.getIdToken()
-      return res.send({ message: 'Signed up!', token })
+      try {
+        await auth.createUserWithEmailAndPassword(email, password).catch(error => {
+          res.status(401).send(error)
+        })
+        let login = await auth.signInWithEmailAndPassword(email, password)
+        let token = await login.user.getIdToken()
+        res.send({ message: 'Signed up!', token })
+      }
+      catch (error) {
+        res.status(401).send(error)
+      }
     }
-    catch (error) {
-      return res.status(401).send(error)
+  )
+
+  router.get('/me', 
+    authorize('user'),
+    (req, res) => {
+      res.send(req.user)
     }
+  )
 
-  }
-)
-
-router.get('/me', 
-  authorize('user'),
-  (req, res) => {
-    return res.send(req.user)
-  }
-)
-
-module.exports = router
+  module.exports = router
+}catch(error) {
+  console.log(error)
+}
