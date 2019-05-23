@@ -1,4 +1,5 @@
-﻿module.exports = (async function(){
+﻿var log = require('./notifications')
+module.exports = (async function () {
   try {
     var express = require('express')
     var path = require('path')
@@ -9,7 +10,8 @@
     var accountsRouter = require('./routes/accounts')
     var auth = require('./routes/auth')
     var influencerrouter = require('./routes/influencers')
-    
+    var weightsrouter = require('./routes/weights')
+
     var app = express()
     var passport = require('passport')
     app.use(passport.initialize())
@@ -23,10 +25,9 @@
     app.use('/v0/accounts', accountsRouter)
     app.use('/v0/auth', auth)
     app.use('/v0/influencers', influencerrouter)
-    
-    var log = require('./notifications')
+    app.use('/v0/weights', weightsrouter)
     log.success('Server Online')
-    
+
     return app
   }
   catch (error) {

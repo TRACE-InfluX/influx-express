@@ -1,7 +1,28 @@
 var log = require('../notifications')
 var db  = require('../database')
+var ObjectId = require('mongodb').ObjectId
+
 
 module.exports = {
+  async get_most_common_weights() {
+    try{
+      let weights = await db.open('weights').find({},{projection: {key: 1, _id: 0}}).sort( { count: -1 } ).limit(10000).toArray()
+      return weights
+    }catch(error) {
+      log.error(error, {in : '/database/weights.get_most_common_weights/0'})
+    }
+  },
+  async get_weights_by_id(_id) {
+    try {
+      let influencers = db.open('influencers')
+      let projections = {processed_weights: 1}
+      let processed_weights = await influencers.findOne({_id: ObjectId(_id) }, {projection: projections})
+      return processed_weights
+    } catch(error) {
+      log.error(error, {in: '/database/weights.get_weights_by_id/1'})
+    }
+  },
+  
   async get() {
     try {
       let args = Array.prototype.slice.call(arguments)

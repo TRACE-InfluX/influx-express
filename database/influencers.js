@@ -1,6 +1,7 @@
 var log = require('../notifications')
 var db = require('../database')
 var global_weights = require('../database/weights')
+var ObjectId = require('mongodb').ObjectId
 // var performance = require('perf_hooks').performance
 
 let get_size = async function() {
@@ -15,6 +16,147 @@ let get_size = async function() {
 }
 
 module.exports = {
+  async get_influencers_by() {
+    try {
+      let args = Array.prototype.slice.call(arguments)
+      let keys = []
+      if (typeof args[0] == 'string') {
+        for (let key of args) {
+          if (typeof key != 'string') {
+            throw 'Expected all arguments to be type: String'
+          }
+          keys.push(key)
+        }
+      }
+      else if (Array.isArray(args[0])) {
+        for (let key of args[0]) {
+          if (typeof key != 'string') {
+            throw 'Expected all arguments to be type: String'
+          }
+          keys.push(key)
+        }
+      }
+      else if (args[0]) {
+        keys = Object.keys(args[0])
+      }
+      let weights = db.open('weights')
+      
+      let hash_keys = keys.map(key => {if(key[0] == '#') return key.substr(1)})
+      keys = keys.concat(hash_keys)
+
+      let query = {
+        $or: keys.map(k => { return { key: k } })
+      }
+
+      let [matched_weights, size] = await Promise.all([
+        weights.find(query, { hint: { 'influencers-by-relevance.relevance': -1 } }).toArray(),
+        get_size()
+      ])
+
+      let merged_pools = {}
+      let the_current_key
+      for (let weight of matched_weights) {
+        the_current_key = weight.key
+        if (the_current_key[0] == '#') {
+          the_current_key = the_current_key.substr(1)
+        }
+        if (!merged_pools[the_current_key]) {
+          merged_pools[the_current_key] = {}
+        }
+        for (let influencer of weight['influencers-by-relevance']) {
+          if (merged_pools[the_current_key][influencer._id]) {
+            merged_pools[the_current_key][influencer._id] += influencer.relevance
+          } else {
+            merged_pools[the_current_key][influencer._id] = influencer.relevance
+          }
+        }
+      }
+
+      let enum_pool = []
+
+      for (let merge_key in merged_pools) {
+        if (merge_key != the_current_key) {
+          enum_pool.push(merged_pools[merge_key])
+        }
+      }
+
+      let accumulator = (pool, next) => {
+        let new_pool = {}
+        for(let id in pool) {
+          if (next[id]) {
+            new_pool[id] = pool[id] + next[id]
+          }
+        }
+        return new_pool
+      }
+
+      let relevance = enum_pool.reduce(accumulator, merged_pools[the_current_key])
+
+      query = {
+        $or: Object.keys(relevance).map(id => { return { _id: ObjectId(id) } })
+      }
+
+      if(!query.$or.length) {
+        throw 404
+      }
+      
+      let influencer_collection = db.open('influencers')
+      let matched_influencers = await influencer_collection.find(query, { projection: { weights: 0, processed_weights: 0}, hint: { _id: 1 } }).toArray()
+      
+      let activity = {}
+      let engagement = {}
+      let reach = {}
+      let profit = {}
+      let cost = {}
+      
+      let operations = []
+      for (let influencer of matched_influencers) {
+        let a = influencer_collection.find({ activity: { $lt: influencer.activity } }, { hint: { activity: -1 } }).count().then(i => { activity[influencer._id] = 100 * i / size })
+        let e = influencer_collection.find({ engagement: { $lt: influencer.engagement } }, { hint: { engagement: -1 } }).count().then(i => { engagement[influencer._id] = 100 * i / size })
+        let r = influencer_collection.find({ followers: { $lt: influencer.followers } }, { hint: { followers: -1 } }).count().then(i => { reach[influencer._id] = 100 * i / size })
+        let p = influencer_collection.find({ profit: { $lt: influencer.profit } }, { hint: { profit: -1 } }).count().then(i => { profit[influencer._id] = 100 * i / size })
+        let c = influencer_collection.find({ cost: { $lt: influencer.cost } }, { hint: { cost: 1 } }).count().then(i => { cost[influencer._id] = 100 * i / size })
+        operations.push(a)
+        operations.push(e)
+        operations.push(r)
+        operations.push(p)
+        operations.push(c)
+      }
+
+      await Promise.all(operations)
+
+      let result = matched_influencers.map(influencer => {
+        let _id = influencer._id
+        influencer.cost_cad = Math.round(100 * influencer.cost) / 100
+        influencer.profit_cad = Math.round(100 * influencer.profit) / 100
+        influencer.relevance = 20 + 10 * Math.log2(2 + relevance[_id]) / keys.length
+        influencer.activity = activity[_id]
+        influencer.engagement = engagement[_id]
+        influencer.reach = reach[_id]
+        influencer.cost = cost[_id]
+        influencer.profit = profit[_id]
+        return influencer
+      })
+
+      return result
+
+    } catch (err) {
+      if (err == 404) throw 404
+      else {
+        log.error( err, { in: '/database/influencers.get_influencers_by/...' })
+      }
+    }
+
+  },
+  async get_popular() {
+    try {
+      let influencers = db.open('influencers')
+      let top_four = await influencers.find({}, { projection: { weights: 0, processed_weights: 0 } }).sort({followers: -1}).limit(4).toArray()
+      return top_four
+    } catch (error) {
+      log.error(error, {in: '/database/influencers.get_popular/0'})
+    }
+  },
   get_size,
   async add(influencer) {
     try {
@@ -22,7 +164,7 @@ module.exports = {
 
       // let t0a = performance.now()
       let [old_data, added_weights] = await Promise.all([
-        collection.find({ username: influencer.username }).toArray(),
+        collection.findOne({ username: influencer.username }),
         global_weights.add(influencer.weights)
       ])
       // let t1a = performance.now()
@@ -30,8 +172,8 @@ module.exports = {
       // log.info('Time to check exists, and add weights: ' + (t1a - t0a) + ' milliseconds')
 
       // let t0b = performance.now()
-      if (old_data.length) {
-        await global_weights.subtract(old_data[0].weights)
+      if (old_data) {
+        await global_weights.subtract(old_data.weights)
       }
       // let t1b = performance.now()
       // log.info('Time to subtract weights: ' + (t1b - t0b) + ' milliseconds')
@@ -72,7 +214,7 @@ module.exports = {
       // let t1e = performance.now()
       // log.info('Time to upsert influencer: ' + (t1e - t0e) + ' milliseconds')
 
-      let _id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data[0]._id
+      let _id = upsert_response.upsertedId ? upsert_response.upsertedId._id : old_data._id
       
       let transactions = []
 
@@ -89,7 +231,7 @@ module.exports = {
       }
 
       // let t0f = performance.now()
-      await db.open('weights').bulkWrite(transactions)
+      db.open('weights').bulkWrite(transactions)
       // let t1f = performance.now()
       // log.info('Time to bulkwrite weights: ' + (t1f - t0f) + ' milliseconds')
 
@@ -105,16 +247,15 @@ module.exports = {
       let collection = db.open('influencers')
 
       let [influencer, size] = await Promise.all([
-        collection.find({ _id: id }, {}).toArray(),
+        collection.findOne({ _id: id }, {}),
         get_size()
       ])
 
-      influencer = influencer[0]
 
       let [activity, engagement, reach] = await Promise.all([
-        collection.find({ _id: { $lt: influencer._id } }, { hint: { activity: -1 } }).count(),
-        collection.find({ _id: { $lt: influencer._id } }, { hint: { engagement: -1 } }).count(),
-        collection.find({ _id: { $lt: influencer._id } }, { hint: { followers: -1 } }).count()
+        collection.find({ activity: { $lt: influencer.activity } }).sort({activity: -1}).count(),
+        collection.find({ engagement: { $lt: influencer.engagement } }).sort({ engagement: -1 }).count(),
+        collection.find({ followers: { $lt: influencer.followers } }).sort({ followers: -1 }).count()
       ])
 
       activity = 100 * (size - activity) / size

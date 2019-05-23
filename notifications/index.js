@@ -46,6 +46,7 @@ module.exports = {
       }
     }
     else {
+      if (!Object.values(error).includes(error.message)) error.msg = error.message
       send('Error', error)
     }
   },

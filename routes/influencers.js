@@ -1,89 +1,67 @@
-var express = require('express')
-var router = express.Router()
-var db = require('../database/influencers')
-var authorize = require('../auth/token')
-var validate = require('../validation')
-var influencer = require('../models/influencer')
 var log = require('../notifications')
+try {
+  var express = require('express')
+  var router = express.Router()
+  var db = require('../database/influencers')
+  var cache = require('../database/cache')
+  var authorize = require('../auth/token')
+  var validate = require('../validation')
+  var influencer = require('../models/influencer')
+  var search = require('../models/search')
 
-// temp imports
-var fs = require('fs')
-var path = require('path')
 
  router.get('/popular', async (req, res, next) => {
-  
-     //let influencers_ref = db.ref('/influencers')
-     //let snapshot = await influencers_ref.orderByChild('followers').limitToLast(4).once('value');
-   filePath = path.join(__dirname, '../config/data.json')
-   fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-     if (!err) {
-       influencerdata = JSON.parse(data);
-       influencers = influencerdata.influencers;
-       let result = []
-       for (i in influencers) {
-         influencers[i].relevance = 100
-         influencers[i].id = i
-         result.push(influencers[i])
-       }
-
-       result.sort((a, b) => {
-         return b.followers - a.followers;
-       });
-       final_result = []
-       final_result.push(result[0], result[1], result[2], result[3])
-       res.send(final_result)
-     } else {
-       log(err, { in: '../routes/influencers/get/v0/influencers/popular'});
-       res.status(500).send(err);
-     }
-   })  
- })
-
- router.get('/', async (req, res, next) => {
    try {
-     //let influencers_ref = db.ref('/influencers')
-     //let snapshot = await influencers_ref.orderByChild('engagement').limitToLast(100).once('value');
-
-     //let influencers = [];
-     //snapshot.forEach(item => {
-     //  let each = item.val()
-     //  each.id = item.key
-     //  each.relevance = calculate_relevance()
-     //  influencers.push(each);
-     //});
-     //influencers.reverse()
-     filePath = path.join(__dirname, '../config/data.json')
-     fs.readFile(filePath, encoding = 'utf-8', (err, data) => {
-       if (!err) {
-         influencerdata = JSON.parse(data);
-         influencers = influencerdata.influencers;
-         let result = []
-         for (i in influencers) {
-           influencers[i].relevance = 100
-           influencers[i].id = i
-           result.push(influencers[i])
-         }
-         result.sort((a, b) => {
-           return b.engagement - a.engagement
-         });
-         res.send(result)
-       } else {
-         log(err, {in: '../routes/get/v0/influencers',  msg: 'trouble reading file'});
-         res.status(500).send(err);
-       }
-     })
-   }
-   catch (error) {
+     let top_four = await db.get_popular()
+     res.send(top_four)
+   } catch (error) {
+     error.endpoint = 'GET /v0/influencers/popular'
+     log.warning(error)
      res.status(500).send(error)
    }
- });
+ })
 
+router.get('/', 
+  validate(search),
+  async (req, res, next) => {
+    try {
+      let query = req.query
+      query.sort_by = JSON.parse(query.sort_by)
+      let cache_result = await cache.load(query)
 
-// function calculate_relevance() {
-//   //TODO
-//   return 1
-// }
+      if(!cache_result){
+        let keys = query.query.toLowerCase().split(' ')
+        let result = await db.get_influencers_by(keys)
+        let weights = query.sort_by
 
+        result.sort((a, b) => {
+
+          let accumulator = (sum,metric) => {
+            return sum + a[metric] * weights[metric] - b[metric] * weights[metric]
+          }
+
+          return Object.keys(weights).reduce(accumulator, 0)
+        })
+
+        await cache.save(query, result)
+        res.send(result)
+      }
+      else {
+        console.log('found an old cache')
+        res.send(cache_result)
+
+      }
+
+    } catch (error) {
+      console.log(error)
+      if(error == 404) return res.status(404).send({ error: 'No Results Found', query: req.body.query})
+      error.endpoint = 'GET /v0/influencers'
+      error.request = req.query
+      log.warning(error)
+      res.status(500).send(error)
+    }
+  }
+);
 router.post('/',
   authorize('admin'),
   validate(influencer),
@@ -95,27 +73,17 @@ router.post('/',
     } catch (error) {
       error.endpoint = 'POST /v0/influencers'
       error.request  = req.body
+      error.request.weights = { keys: '...' }
+      error.request.preview = ['...']
       log.warning(error)
       res.status(500).send(error)
     }
   }
 )
 
-// async function checkuserexists(username) {
-//   let ref = db.ref('/influencers')
-//   let snapshot = await ref.once('value')
-//   let influencernames = {}
-//   snapshot.forEach((item) => {
-//     name = item.val().username
-//     influencernames[name] = item.key
-//   });
-//   if (username in influencernames) {
-//     return {
-//       uid: influencernames[username],
-//       username: username
-//     }
-//   } else { return false }
-
-// }
-
-module.exports = router;
+  module.exports = router;
+}
+catch (error) {
+  console.log(error)
+  log.error(error, {in: '/routes/influencers.js'})
+}

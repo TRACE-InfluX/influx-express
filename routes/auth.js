@@ -9,7 +9,8 @@ router.post('/',
     try {
       let login  = await auth.signInWithEmailAndPassword(req.body.email, req.body.password)
       let token  = await login.user.getIdToken()
-      return res.send({ message: 'Logged in!', token })
+      console.log(req)
+      return res.send({ message: 'Logged in!', token})
     }
     catch (error) {
       return res.status(401).send(error)

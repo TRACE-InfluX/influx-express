@@ -5,10 +5,12 @@
     setTimeout(async() => {
       let weights     = db.open('weights');
       let influencers = db.open('influencers');
+	  let query_cache = db.open('query-cache');
       
       await Promise.all([
         weights.drop(), 
-        influencers.drop() 
+        influencers.drop(),
+		query_cache.drop()
       ]);
       
       await Promise.all([
@@ -19,7 +21,9 @@
         influencers.createIndex({ engagement : -1 }),
         influencers.createIndex({ followers : -1 }),
         influencers.createIndex({ cost : 1 }),
-        influencers.createIndex({ profit : -1 })
+        influencers.createIndex({ profit : -1 }),
+		    query_cache.createIndex({ query : 1 }),
+        query_cache.createIndex({'caches.sorts': 1})
       ]);  
 
       process.exit()
