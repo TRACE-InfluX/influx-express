@@ -30,7 +30,6 @@ router.get('/',
       let cache_result = await cache.load(query)
 
       if(!cache_result){
-
         let keys = query.query.toLowerCase().split(' ')
         let result = await db.get_influencers_by(keys)
         let weights = query.sort_by
@@ -48,7 +47,9 @@ router.get('/',
         res.send(result)
       }
       else {
+        console.log('found an old cache')
         res.send(cache_result)
+
       }
 
     } catch (error) {

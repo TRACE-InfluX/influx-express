@@ -27,6 +27,7 @@ module.exports = (async function () {
     app.use('/v0/influencers', influencerrouter)
     app.use('/v0/weights', weightsrouter)
     log.success('Server Online')
+
     return app
   }
   catch (error) {

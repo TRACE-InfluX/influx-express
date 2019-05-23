@@ -40,8 +40,8 @@ module.exports = {
         keys = Object.keys(args[0])
       }
       let weights = db.open('weights')
-
-      let hash_keys = keys.map(key => '#' + key)
+      
+      let hash_keys = keys.map(key => {if(key[0] == '#') return key.substr(1)})
       keys = keys.concat(hash_keys)
 
       let query = {
