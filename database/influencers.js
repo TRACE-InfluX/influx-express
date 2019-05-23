@@ -41,7 +41,7 @@ module.exports = {
       }
       let weights = db.open('weights')
       
-      let hash_keys = keys.map(key => {if(key[0] == '#') return key.substr(1)})
+      let hash_keys = keys.map(key => '#' + key)
       keys = keys.concat(hash_keys)
 
       let query = {
@@ -49,7 +49,7 @@ module.exports = {
       }
 
       let [matched_weights, size] = await Promise.all([
-        weights.find(query, { hint: { 'influencers-by-relevance.relevance': -1 } }).toArray(),
+        weights.find(query, { hint: { key: 1 } }).toArray(),
         get_size()
       ])
 
@@ -57,7 +57,7 @@ module.exports = {
       let the_current_key
       for (let weight of matched_weights) {
         the_current_key = weight.key
-        if (the_current_key[0] == '#') {
+        while (the_current_key[0] == '#') {
           the_current_key = the_current_key.substr(1)
         }
         if (!merged_pools[the_current_key]) {
