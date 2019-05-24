@@ -53,6 +53,10 @@ module.exports = {
         get_size()
       ])
 
+      if(!matched_weights.length) {
+        throw 404
+      }
+
       let merged_pools = {}
       let the_current_key
       for (let weight of matched_weights) {
