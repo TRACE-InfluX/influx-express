@@ -53,6 +53,9 @@ module.exports = {
       const weights = db.open('weights')
       const projection = { key:1, count:1, _id:0 }
       const data = await weights.find(query, { projection }).toArray()
+      if(!data.length) {
+        throw 404
+      }
       let result = {}
       for (let weight of data) {
         result[weight.key] = weight.count
